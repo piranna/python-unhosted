@@ -1,0 +1,82 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# Python library for Unhosted storage node.
+# Copyright 2010 Dmitrij "Divius" Tantsur <divius.inside@gmail.com>
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+#
+
+"""This package implements Unhosted server-side classes and handlers.
+
+This package exports Unhosted and Storage classes.
+
+"""
+
+__all__ = ['Storage', 'Unhosted']
+
+import zope.interface
+
+class IStorage(zope.interface.Interface):
+    """Interface for Unhosted storages."""
+
+    def get(account, key, default=None):
+        """Gets value from storage."""
+
+    def set(account, key, value):
+        """Sets value in storage."""
+
+    def has(account, key):
+        """Checks key presence in storage."""
+
+class IMailer(zope.interface.Interface):
+    """Interface for Unhosted mailers."""
+
+    def mailto(fromaddr, toaddr, message):
+        """Send mail to address."""
+
+class Unhosted(object):
+    """Class representing Unhosted engine."""
+
+    def __init__(self, storage, mailer=None):
+        """C-tor.
+
+        Argument 'storage' should be of type unhosted.Storage.
+
+        """
+        assert IStorage.providedBy(storage)
+        self.storage = storage
+        if mailer is not None:
+            assert IMailer.providedBy(mailer)
+        self.mailer = mailer
+
+        import unhosted.protocol_0_2
+        self.protocol_0_2 = unhosted.protocol_0_2.Unhosted_0_2(self)
+
+    def processRequest(self, request):
+        """Process RPC request (either json string or dict)."""
+        if isinstance(request, str):
+            import unhosted.json
+            request = unhosted.json.jread(request)
+        import unhosted.http
+        try:
+            proto = request["protocol"]
+        except KeyError:
+            raise unhosted.http.HttpBadRequest("protocol field is obligatory")
+
+        if proto == "UJ/0.2":
+            return self.protocol_0_2.process(self, request)
+        else:
+            raise unhosted.http.HttpBadRequest("unsupported protocol %s" % proto)
