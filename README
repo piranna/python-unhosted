@@ -1,5 +1,3 @@
-python-unhosted
-
 This is a Python library for Unhosted project (http://unhosted.org).
 It provides a class implementing Unhosted JSON protocol and support for
 Twisted Web (http://twistedmatrix.com).
@@ -7,26 +5,24 @@ Twisted Web (http://twistedmatrix.com).
 Python-Unhosted is licensed under GNU LGPL license.
 
 Module layout:
-- ./unhosted/__init__.py [import unhosted]: Unhosted protocol implementation and Storage interface
-- ./unhosted/storage.py [import unhosted.storage]: Some useful storage classes
-- ./unhosted/twisted.py [import unhosted.twisted]: Twisted support classes
-- ./unhosted/http.py [import unhosted.http]: HTTP codes as exceptions
-- ./unhosted/protocol_0_2.py [import unhosted.protocol_0_2]: UJ/0.2 implementation
-- ./unhosted/json.py [import unhosted.json]: JSON implementation
-- ./tests/ - Unit tests using Trial from Twisted Core
+ * ./unhosted/__init__.py: Unhosted protocol implementation and Storage interface
+ * ./unhosted/storage.py: Some useful storage classes
+ * ./unhosted/twisted.py: Twisted support classes
+ * ./unhosted/http.py: HTTP codes as exceptions
+ * ./unhosted/protocol_0_2.py: UJ/0.2 implementation
+ * ./unhosted/json.py: JSON implementation
+ * ./tests/ - Unit tests using Trial from Twisted Core
 
 Library features the following classes:
-- Storage - abstract base class for any kind of storages.
-  Contains get(), put() and has() methods.
-  Value can be looked up by account and key.
-- DictStorage - wrapper around any dict-like object.
-- DatabaseStorage - wrapper around any DB-API 2.0 compatible connection.
-- Unhosted - main class, unfinished. Will provide processRequest().
+ * IStorage - interface for any kind of storages.  Contains get(), put() and has() methods. Value can be looked up by account and key.
+ * DictStorage - wrapper around any dict-like object.
+ * DatabaseStorage - wrapper around any DB-API 2.0 compatible connection.
+ * Unhosted - main class, unfinished. Will provide processRequest().
 
 TODO:
-- Finish Unhosted_0_2 class
-- Finish test cases
-- Write MemcachedStorage - memcached wrapper around some other Storage
-- Check protocol consistency with PHP version
-- Write helper functions for using in CGI, WSCGI applications
-- Create Storage and helper code for using with TwistedWeb and TwistedEnterprise (or compatible).
+ * Finish Unhosted_0_2 class
+ * Finish test cases
+ * Write MemcachedStorage - memcached wrapper around some other Storage
+ * Check protocol consistency with PHP version
+ * Write helper functions for using in CGI, WSCGI applications
+ * Create Storage and helper code for using with TwistedWeb and TwistedEnterprise (or compatible).

@@ -31,7 +31,7 @@ setup(
     description='Python Library for Unhosted',
     author='Dmitry "Divius" Tantsur',
     author_email='divius.inside@gmail.com',
-    url='http://gitorious.org/python-unhosted',
+    url='http://code.google.com/p/python-unhosted',
     packages=['unhosted'],
     provides=['unhosted'],
     classifiers=[
