@@ -22,8 +22,7 @@
 """This package contains some utils for Unhosted."""
 
 def _detectJSON():
-    # Determine what JSON module we have
-
+    """Determine what JSON module we have."""
     try:
         # Try use anyjson
         import anyjson
@@ -53,3 +52,13 @@ def _detectJSON():
             + "anyjson, json, minjson")
 
 jread, jwrite = _detectJSON()
+
+def _detectMD5():
+    """Detect md5 implementation for current version of Python."""
+    try:
+        from hashlib import md5
+    except ImportError:
+        from md5 import new as md5
+    return md5
+
+md5 = _detectMD5()
