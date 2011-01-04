@@ -53,3 +53,39 @@ class Unhosted_0_2(object):
         assert callable(proc)
 
         return proc(request)
+
+    # Protected
+
+    def _fetchAccount(self, request, *otherParams):
+        """Check and fetch account from request."""
+        try:
+            params = (request["emailUser"], request["emailDomain"],
+                request["storageNode"], request["app"])
+        except KeyError:
+            raise unhosted.http.HttpBadRequest("emailUser, emailDomain, storageNode (or HOST), "
+                + " app (or REFERRER) required for %s action" % request["action"])
+        kwparams = {}
+        for other in otherParams:
+            try:
+                kwparams[other] = request[other]
+            except KeyError:
+                raise unhosted.http.HttpBadRequest("%s required for %s action"
+                    % (other, request["action"]))
+        return self.unhosted.storage.account(*params, **kwparams)
+
+    def _fetchFields(self, request, *fields):
+        """Checks and fetch fields from request."""
+        result = tuple()
+        for field in fields:
+            try:
+                result += (request[field],)
+            except KeyError:
+                raise unhosted.http.HttpBadRequest("%s required for %s action" %
+                    (field, request["action"]))
+        return result
+
+    def _handle_KV_GET(self, request):
+        """KV.GET"""
+        (keyPath,) = self._fetchFields(request, "keyPath")
+        acc = self._fetchAccount(request, "subPass")
+        return self.unhosted.storage.get(acc, keyPath)
