@@ -1,6 +1,7 @@
 This is a Python library for Unhosted project (http://unhosted.org).
-It provides a class implementing Unhosted JSON protocol and support for
-Twisted Web (http://twistedmatrix.com).
+It provides a class implementing Unhosted JSON protocol
+(https://github.com/michiel-unhosted/unhosted/wiki/The-UJ-0.2-protocol)
+and support for Twisted Web (http://twistedmatrix.com).
 
 Python-Unhosted is licensed under GNU LGPL license.
 
@@ -10,14 +11,16 @@ Module layout:
  * ./unhosted/twisted.py: Twisted support classes
  * ./unhosted/http.py: HTTP codes as exceptions
  * ./unhosted/protocol_0_2.py: UJ/0.2 implementation
- * ./unhosted/json.py: JSON implementation
+ * ./unhosted/utils.py: JSON and MD5 implementations
  * ./tests/ - Unit tests using Trial from Twisted Core
 
 Library features the following classes:
- * IStorage - interface for any kind of storages.  Contains get(), put() and has() methods. Value can be looked up by account and key.
- * DictStorage - wrapper around any dict-like object.
- * DatabaseStorage - wrapper around any DB-API 2.0 compatible connection.
- * Unhosted - main class, unfinished. Will provide processRequest().
+ * unhosted.IStorage - interface for any kind of storages. Stores (value, signature) tuples. Contains get(), put() and has() methods. Value can be looked up by account and key.
+ * unhosted.IAccount - interface for storage-specific account implementations.
+ * unhosted.storage.DictStorage - wrapper around any dict-like object.
+ * unhosted.storage.DatabaseStorage - wrapper around any DB-API 2.0 compatible connection.
+ * unhosted.Unhosted - main class, provides processRequest().
+ * unhosted.twisted.UnhostedResource - TwistedWeb resource for Unhosted.
 
 TODO:
  * Finish Unhosted_0_2 class
@@ -26,3 +29,11 @@ TODO:
  * Check protocol consistency with PHP version
  * Write helper functions for using in CGI, WSCGI applications
  * Create Storage and helper code for using with TwistedWeb and TwistedEnterprise (or compatible).
+
+Installation:
+ * Clone our main development branch: hg clone https://python-unhosted.googlecode.com/hg/ python-unhosted
+ * Be sure to have Python >= 2.4 and optionally TwistedWeb
+ * Install into system-wide location: python setup.py install
+ * ... or into home directory: python setup.py install --home
+ * ... or create RPM: python setup.py bdist_rpm
+ * ... or view distutils-provided help: python setup.py --help
