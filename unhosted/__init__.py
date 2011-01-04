@@ -32,11 +32,11 @@ import zope.interface
 class IStorage(zope.interface.Interface):
     """Interface for Unhosted storages."""
 
-    def get(account, key, default=None):
-        """Gets value from storage."""
+    def get(account, key):
+        """Gets (value, signature) from storage or None."""
 
-    def set(account, key, value):
-        """Sets value in storage."""
+    def set(account, key, value, signature):
+        """Sets value and signature in storage."""
 
     def has(account, key):
         """Checks key presence in storage."""
@@ -95,6 +95,6 @@ class Unhosted(object):
             raise unhosted.http.HttpBadRequest("protocol field is obligatory")
 
         if proto == "UJ/0.2":
-            return self.protocol_0_2.process(self, request)
+            return self.protocol_0_2.process(request)
         else:
             raise unhosted.http.HttpBadRequest("unsupported protocol %s" % proto)
