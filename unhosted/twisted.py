@@ -48,16 +48,15 @@ class UnhostedResource(resource.Resource):
     def __init__(self, unhosted):
         """C-tor."""
         self.unhosted = unhosted
-        self.d = None
-        self.canceled = False
 
     def render_POST(self, request):
         """Render POST request."""
         args = _convertArgs(request.args)
-        self.d = defer.maybeDeferred(self.unhosted.processRequest(args))
-        self.d.addCallback(self._ready, request)
-        self.d.addErrback(self._error, request)
-        request.notifyFinish().addErrback(self._fail)
+        request._unhosted_canceled = False
+        request._unhosted_d = defer.maybeDeferred(self.unhosted.processRequest(args))
+        request._unhosted_d.addCallback(self._ready, request)
+        request._unhosted_d.addErrback(self._error, request)
+        request.notifyFinish().addErrback(self._fail, request)
         return server.NOT_DONE_YET
 
     # Protected
@@ -73,7 +72,7 @@ class UnhostedResource(resource.Resource):
 
     def _error(self, err, request):
         """Error while requesting data."""
-        if self.canceled:
+        if request._unhosted_canceled:
             return
 
         if isinstance(err.value, unhosted.http.HttpStatus):
@@ -85,7 +84,8 @@ class UnhostedResource(resource.Resource):
         request.write(err.getErrorMessage() + "\n")
         request.finish()
 
-    def _fail(self, err):
+    def _fail(self, err, request):
         """Client-side error."""
-        self.canceled = True
-        self.d.cancel()
+        request._unhosted_canceled = True
+        if request._unhosted_d:
+            request._unhosted_d.cancel()
