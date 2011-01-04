@@ -24,35 +24,35 @@
 class HttpStatus(StandardError):
     """HTTP status abstraction."""
 
-    _header = None
+    _code = None
 
-    def header(self):
-        """HTTP header."""
-        if self._header is None:
-            raise NotImplementedError("HttpStatus child must declare _header field")
-        return self._header
+    def code(self):
+        """HTTP code."""
+        if self._code is None:
+            raise NotImplementedError("HttpStatus child must declare _code field")
+        return self._code
 
 class HttpBadRequest(HttpStatus):
     """HTTP 400."""
 
-    _header = "HTTP/1.1 400 Bad Request"
+    _code = 400
 
 class HttpGone(HttpStatus):
     """HTTP 410."""
 
-    _header = "HTTP/1.1 410 Gone"
+    _code = 410
 
 class HttpForbidden(HttpStatus):
     """HTTP 403."""
 
-    _header = "HTTP/1.1 403 Forbidden"
+    _code = 403
 
 class HttpInternalServerError(HttpStatus):
     """HTTP 500."""
 
-    _header = "HTTP/1.1 500 Internal Server Error"
+    _code = 500
 
 class HttpServiceUnavailable(HttpStatus):
     """HTTP 513."""
 
-    _header = "HTTP/1.1 513 Service Unavailable"
+    _code = 513
