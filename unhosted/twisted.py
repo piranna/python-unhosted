@@ -28,6 +28,9 @@ __all__ = ['UnhostedResource']
 from twisted.web import resource
 from twisted.internet import defer
 
+import unhosted.http
+import unhosted.utils
+
 def _convertArgs(args):
     result = {}
     for key, value in args.iteritems():
@@ -45,23 +48,32 @@ class UnhostedResource(resource.Resource):
     def __init__(self, unhosted):
         """C-tor."""
         self.unhosted = unhosted
+        self.d = None
 
     def render_POST(self, request):
         """Render POST request."""
         args = _convertArgs(request.args)
-        d = defer.maybeDeferred(self.unhosted.processRequest(args))
-        d.addCallback(self._ready, request)
-        d.addErrback(self._error, request)
+        self.d = defer.maybeDeferred(self.unhosted.processRequest(args))
+        self.d.addCallback(self._ready, request)
+        self.d.addErrback(self._error, request)
         return server.NOT_DONE_YET
 
     # Protected
 
     def _ready(self, data, request):
         """Requested data ready."""
+        if not isinstance(data, str):
+            data = unhosted.utils.jwrite(data)
+        request.setResponseCode(200, "OK")
         request.write(data + "\n")
         request.finish()
 
     def _error(self, err, request):
         """Error while requesting data."""
-        request.write(str(err) + "\n")
+        if isinstance(err.value, unhosted.http.HttpStatus):
+            request.setResponseCode(err.value.code(), err.getErrorMessage())
+        else:
+            request.setResponseCode(unhosted.http.HttpInternalServerError._code,
+                "Unknown exception: " + err.getErrorMessage())
+        request.write(err.getErrorMessage() + "\n")
         request.finish()
