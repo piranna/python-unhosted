@@ -32,17 +32,6 @@ class HttpStatus(StandardError):
             raise NotImplementedError("HttpStatus child must declare _header field")
         return self._header
 
-class HttpOk(HttpStatus):
-    """HTTP 200 OK."""
-
-    def header(self):
-        return None
-
-class HttpServiceUnavailable(HttpStatus):
-    """HTTP 513."""
-
-    _header = "HTTP/1.1 513 Service Unavailable"
-
 class HttpBadRequest(HttpStatus):
     """HTTP 400."""
 
@@ -54,17 +43,16 @@ class HttpGone(HttpStatus):
     _header = "HTTP/1.1 410 Gone"
 
 class HttpForbidden(HttpStatus):
-    """HTTP 402."""
+    """HTTP 403."""
 
-    _header = "HTTP/1.1 402 Forbidden"
-
-class HttpNotFound(HttpStatus):
-    """HTTP 404."""
-
-    _header = "HTTP/1.1 404 Not Found"
+    _header = "HTTP/1.1 403 Forbidden"
 
 class HttpInternalServerError(HttpStatus):
     """HTTP 500."""
 
     _header = "HTTP/1.1 500 Internal Server Error"
 
+class HttpServiceUnavailable(HttpStatus):
+    """HTTP 513."""
+
+    _header = "HTTP/1.1 513 Service Unavailable"
