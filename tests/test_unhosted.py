@@ -43,9 +43,9 @@ class UnhostedTestCase(unittest.TestCase):
 
         # Get-set-has
         self.failIf(storage.has("account", "key"))
-        storage.set("account", "key", "value")
+        storage.set("account", "key", "value", "sign")
         self.failUnless(storage.has("account", "key"))
-        self.failUnlessEqual(storage.get("account", "key"), "value")
+        self.failUnlessEqual(storage.get("account", "key"), ("value", "sign"))
         self.failUnless(storage.has("account", "key"))
         self.failIf(storage.has("account1", "key"))
         self.failIf(storage.has("account", "key1"))
@@ -61,3 +61,18 @@ class UnhostedTestCase(unittest.TestCase):
         import unhosted
         import unhosted.storage
         uh = unhosted.Unhosted(unhosted.storage.DictStorage({}))
+
+        request = {
+            "protocol"      : "UJ/0.2",
+            "emailUser"     : "testUser",
+            "emailDomain"   : "testDomain",
+            "storageNode"   : "testNode",
+            "app"           : "testApp",
+            "action"        : "KV.GET",
+            "keyPath"       : "test",
+            "subPass"       : "testPassword"
+        }
+
+        response = uh.processRequest(request)
+        self.failUnlessEqual(response["value"], None)
+        self.failUnlessEqual(response["PubSign/0.2"], None)
