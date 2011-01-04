@@ -68,8 +68,8 @@ class Unhosted(object):
     def processRequest(self, request):
         """Process RPC request (either json string or dict)."""
         if isinstance(request, str):
-            import unhosted.json
-            request = unhosted.json.jread(request)
+            import unhosted.utils
+            request = unhosted.utils.jread(request)
         import unhosted.http
         try:
             proto = request["protocol"]

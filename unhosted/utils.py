@@ -19,7 +19,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-"""This package contains JSON implementation for Unhosted."""
+"""This package contains some utils for Unhosted."""
 
 def _detectJSON():
     # Determine what JSON module we have
