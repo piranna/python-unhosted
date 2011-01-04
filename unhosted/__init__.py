@@ -41,6 +41,24 @@ class IStorage(zope.interface.Interface):
     def has(account, key):
         """Checks key presence in storage."""
 
+    def account(userName, userDomain, node, application, **kwargs):
+        """Construct an account for further use in storage.
+
+        This call generally doesn't check for existence and correctness.
+        This checks are done by some call that uses account.
+
+        Returns IAccount. Real type depends on storage implementation.
+
+        """
+
+class IAccount(zope.interface.Interface):
+    """Interface for Unhosted account.
+
+    Account instances shouldn't be created directly, use IStorage.account()
+    instead.
+
+    """
+
 class IMailer(zope.interface.Interface):
     """Interface for Unhosted mailers."""
 
