@@ -40,6 +40,17 @@ def _convertArgs(args):
             result[key] = value
     return result
 
+def _processDeferreds(data):
+    def _doProcessOneDeferred(value, data, key):
+        data[key] = value
+
+    deferlist = []
+    for key in data:
+        if isinstance(data[key], defer.Deferred):
+            data[key].addCallback(_doProcessOneDeferred, data, key)
+            deferlist.append(data[key])
+    return defer.DeferredList(deferlist)
+
 class UnhostedResource(resource.Resource):
     """TwistedWeb resource for Unhosted."""
 
@@ -53,7 +64,9 @@ class UnhostedResource(resource.Resource):
         """Render POST request."""
         args = _convertArgs(request.args)
         request._unhosted_canceled = False
-        request._unhosted_d = defer.maybeDeferred(self.unhosted.processRequest(args))
+        request._unhosted_d = defer.maybeDeferred(
+            self.unhosted.processRequest(args))
+        request._unhosted_d.addCallback(_processDeferreds)
         request._unhosted_d.addCallback(self._ready, request)
         request._unhosted_d.addErrback(self._error, request)
         request.notifyFinish().addErrback(self._fail, request)
