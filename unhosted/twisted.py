@@ -45,11 +45,14 @@ def _processDeferreds(data):
         data[key] = value
 
     deferlist = []
-    for key in data:
-        if isinstance(data[key], defer.Deferred):
-            data[key].addCallback(_doProcessOneDeferred, data, key)
-            deferlist.append(data[key])
-    return defer.DeferredList(deferlist)
+    if isinstance(data, dict):
+        for key in data:
+            if isinstance(data[key], defer.Deferred):
+                data[key].addCallback(_doProcessOneDeferred, data, key)
+                deferlist.append(data[key])
+        return defer.DeferredList(deferlist)
+    else:
+        return defer.maybeDeferred(data)
 
 class UnhostedResource(resource.Resource):
     """TwistedWeb resource for Unhosted."""
@@ -76,11 +79,12 @@ class UnhostedResource(resource.Resource):
 
     def _ready(self, data, request):
         """Requested data ready."""
-        if not isinstance(data, str):
+        if data is not None and not isinstance(data, str):
             data = unhosted.utils.jwrite(data)
 
         request.setResponseCode(200, "OK")
-        request.write(data + "\n")
+        if data is not None:
+            request.write(data + "\n")
         request.finish()
 
     def _error(self, err, request):
