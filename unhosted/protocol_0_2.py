@@ -90,3 +90,9 @@ class Unhosted_0_2(object):
         acc = self._fetchAccount(request, "subPass")
         value, signature = self.unhosted.storage.get(acc, keyPath)
         return {"value" : value, "PubSign/0.2" : signature}
+
+    def _handle_KV_SET(self, request):
+        """KV.SET"""
+        (keyPath, value, PubSign) = self._fetchFields(request, "keyPath", "value", "PubSign")
+        acc = self._fetchAccount(request, "pubPass")
+        return self.unhosted.storage.set(acc, keyPath, value, PubSign)
