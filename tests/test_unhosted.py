@@ -60,7 +60,10 @@ class UnhostedTestCase(unittest.TestCase):
     def test_30_unhosted_0_2(self):
         import unhosted
         import unhosted.storage
-        uh = unhosted.Unhosted(unhosted.storage.DictStorage({}))
+        import unhosted.utils
+        uh = unhosted.Unhosted(
+            unhosted.storage.DictStorage({}),
+            unhosted.utils.VoidChecker())
 
         request = {
             "protocol"      : "UJ/0.2",

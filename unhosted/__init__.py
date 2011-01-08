@@ -51,6 +51,16 @@ class IStorage(zope.interface.Interface):
 
         """
 
+class IRegistrationChecker(zope.interface.Interface):
+    """Interface for Unhosted account registration checker."""
+
+    def check(account):
+        """Start checking process for account.
+
+        Account should implement IAccount.
+
+        """
+
 class IAccount(zope.interface.Interface):
     """Interface for Unhosted account.
 
@@ -59,16 +69,10 @@ class IAccount(zope.interface.Interface):
 
     """
 
-class IMailer(zope.interface.Interface):
-    """Interface for Unhosted mailers."""
-
-    def mailto(fromaddr, toaddr, message):
-        """Send mail to address."""
-
 class Unhosted(object):
     """Class representing Unhosted engine."""
 
-    def __init__(self, storage, mailer=None):
+    def __init__(self, storage, registrationChecker):
         """C-tor.
 
         Argument 'storage' should be of type unhosted.Storage.
@@ -76,9 +80,8 @@ class Unhosted(object):
         """
         assert IStorage.providedBy(storage)
         self.storage = storage
-        if mailer is not None:
-            assert IMailer.providedBy(mailer)
-        self.mailer = mailer
+        assert IRegistrationChecker.providedBy(registrationChecker)
+        self.registrationChecker = registrationChecker
 
         import unhosted.protocol_0_2
         self.protocol_0_2 = unhosted.protocol_0_2.Unhosted_0_2(self)

@@ -21,6 +21,9 @@
 
 """This package contains some utils for Unhosted."""
 
+import zope.interface
+import unhosted
+
 def _detectJSON():
     """Determine what JSON module we have."""
     try:
@@ -62,3 +65,12 @@ def _detectMD5():
     return md5
 
 md5 = _detectMD5()
+
+class VoidChecker(object):
+    """Registration checker that always succeeds."""
+
+    zope.interface.implements(unhosted.IRegistrationChecker)
+
+    def check(account):
+        """Mark account as checked."""
+        pass # TODO
