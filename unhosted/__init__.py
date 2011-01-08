@@ -26,6 +26,8 @@ This package exports Unhosted and Storage classes.
 """
 
 __all__ = ['Storage', 'Unhosted']
+__version_info__ = ('0', '2', '0')
+__version__ = '.'.join(__version_info__)
 
 import zope.interface
 
