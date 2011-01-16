@@ -23,6 +23,28 @@
 
 import unhosted.http
 
+
+class KV():
+    '''
+    Key-Value module
+    '''
+    def __init__(self, processor):
+        self._processor = processor
+
+    def GET(self, request):
+        """KV.GET"""
+        (keyPath,) = self._processor._fetchFields(request, "keyPath")
+        acc = self._processor._fetchAccount(request, "subPass")
+        value, signature = self._processor.unhosted.storage.get(acc, keyPath)
+        return {"value" : value, "PubSign/0.2" : signature}
+
+    def SET(self, request):
+        """KV.SET"""
+        (keyPath, value, PubSign) = self._processor._fetchFields(request, "keyPath", "value", "PubSign")
+        acc = self._processor._fetchAccount(request, "pubPass")
+        return self._processor.unhosted.storage.set(acc, keyPath, value, PubSign)
+
+
 class Unhosted_0_2(object):
     """Unhosted UJ/0.2 implementation."""
 
@@ -30,8 +52,12 @@ class Unhosted_0_2(object):
         """C-tor."""
         self.unhosted = unhosted
 
+        # Modules
+        self.KV = KV(self)
+
     def process(self, request):
         """Process UJ/0.2 request."""
+        # Get action
         try:
             action = request["action"]
         except KeyError:
@@ -45,13 +71,16 @@ class Unhosted_0_2(object):
         if not action:
             raise unhosted.http.HttpBadRequest("empty action field")
 
+        # Get requested method from the action
         try:
-            proc = getattr(self, "_handle_" + action.replace(".", "_"))
+            action = action.split(".")
+            module = getattr(self, action[0])
+            proc = getattr(module, action[1])
         except AttributeError:
             raise unhosted.http.HttpBadRequest("unsupported action: %s" % action)
 
+        # Call requested method
         assert callable(proc)
-
         return proc(request)
 
     # Protected
@@ -83,16 +112,3 @@ class Unhosted_0_2(object):
                 raise unhosted.http.HttpBadRequest("%s required for %s action" %
                     (field, request["action"]))
         return result
-
-    def _handle_KV_GET(self, request):
-        """KV.GET"""
-        (keyPath,) = self._fetchFields(request, "keyPath")
-        acc = self._fetchAccount(request, "subPass")
-        value, signature = self.unhosted.storage.get(acc, keyPath)
-        return {"value" : value, "PubSign/0.2" : signature}
-
-    def _handle_KV_SET(self, request):
-        """KV.SET"""
-        (keyPath, value, PubSign) = self._fetchFields(request, "keyPath", "value", "PubSign")
-        acc = self._fetchAccount(request, "pubPass")
-        return self.unhosted.storage.set(acc, keyPath, value, PubSign)
