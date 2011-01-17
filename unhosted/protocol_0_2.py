@@ -80,7 +80,7 @@ class Unhosted_0_2(object):
             raise unhosted.http.HttpBadRequest("module not available: %s" % action[0])
         except AttributeError:
             raise unhosted.http.HttpBadRequest("unsupported action: %s" % action)
-        except :
+        except TypeError:
             raise unhosted.http.HttpInternalServerError("%s is an attribute" % action)
 
         return proc(request)
