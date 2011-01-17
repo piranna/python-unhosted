@@ -24,7 +24,7 @@
 import unhosted.http
 
 
-class KV():
+class KV(object):
     '''
     Key-Value module
     '''
@@ -53,7 +53,7 @@ class Unhosted_0_2(object):
         self.unhosted = unhosted
 
         # Modules
-        self.KV = KV(self)
+        self.modules = {'KV': KV(self)}
 
     def process(self, request):
         """Process UJ/0.2 request."""
@@ -74,13 +74,15 @@ class Unhosted_0_2(object):
         # Get requested method from the action
         try:
             action = action.split(".")
-            module = getattr(self, action[0])
+            module = self.modules[action[0]]
             proc = getattr(module, action[1])
+        except KeyError:
+            raise unhosted.http.HttpBadRequest("module not available: %s" % action[0])
         except AttributeError:
             raise unhosted.http.HttpBadRequest("unsupported action: %s" % action)
+        except :
+            raise unhosted.http.HttpInternalServerError("%s is an attribute" % action)
 
-        # Call requested method
-        assert callable(proc)
         return proc(request)
 
     # Protected
