@@ -32,9 +32,15 @@ class DummyAccount(object):
 class UtilsTestCase(unittest.TestCase):
 
     def test_10_json(self):
-        obj = {"1" : 2, "3" : ["a", None, 42], "4" : None, "5" : "6"}
+        embedded = {"1" : "2", "3" : [1, 2, 3]}
+        jembedded = unhosted.utils.jwrite(embedded)
+        self.failUnlessEqual(unhosted.utils.jread(jembedded), embedded)
+
+        obj = {"1" : 2, "3" : ["a", None, 42], "4" : None, "5" : "6",
+        "jtest" : jembedded}
         json = unhosted.utils.jwrite(obj)
         self.failUnlessEqual(unhosted.utils.jread(json), obj)
+        self.failUnlessEqual(obj["jtest"], jembedded)
 
     def test_20_md5(self):
         testData = {
