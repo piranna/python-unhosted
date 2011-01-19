@@ -40,9 +40,10 @@ class KV(object):
 
     def SET(self, request):
         """KV.SET"""
-        (keyPath, value, PubSign) = self._processor.fetchFields(request, "keyPath", "value", "PubSign")
+        (keyPath, value, PubSign) = self._processor.fetchFields(request, "keyPath", "value", "PubSign/0.2")
         acc = self._processor.fetchAccount(request, "pubPass")
-        return self._processor.unhosted.storage.set(acc, keyPath, value, PubSign)
+        self._processor.unhosted.storage.set(acc, keyPath, value, PubSign)
+        return {}
 
 
 class Unhosted_0_2(object):
