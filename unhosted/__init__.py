@@ -71,6 +71,19 @@ class IAccount(zope.interface.Interface):
 
     """
 
+class IModule(zope.interface.Interface):
+    """Interface for Unhosted module."""
+
+    def initialize(unhosted):
+        """Initialize module for given unhosted instance."""
+
+    def processRequest(request):
+        """Process request for this module.
+
+        Can raise various exceptions from unhosted.http.
+
+        """
+
 class Unhosted(object):
     """Class representing Unhosted engine."""
 
@@ -80,13 +93,27 @@ class Unhosted(object):
         Argument 'storage' should be of type unhosted.Storage.
 
         """
-        assert IStorage.providedBy(storage)
-        self.storage = storage
-        assert IRegistrationChecker.providedBy(registrationChecker)
-        self.registrationChecker = registrationChecker
+        if not IStorage.providedBy(storage):
+            raise TypeError("storage must provide IStorage")
+        if not IRegistrationChecker.providedBy(registrationChecker):
+            raise TypeError("registrationChecker must provide IRegistrationChecker")
 
-        import unhosted.protocol_0_2
-        self.protocol_0_2 = unhosted.protocol_0_2.Unhosted_0_2(self)
+        self.storage = storage
+        self.registrationChecker = registrationChecker
+        self.modules = {}
+
+    def registerModule(self, module, names):
+        """Register module instance for given module names."""
+        if not IModule.providedBy(module):
+            raise TypeError("module must provide IModule")
+        if not isinstance(names, list):
+            raise TypeError("names must be a list of strings")
+
+        for name in names:
+            if not isinstance(name, str):
+                raise TypeError("names must be a list of strings")
+            self.modules[name] = module
+        module.initialize(self)
 
     def processRequest(self, request):
         """Process RPC request (either json string or dict)."""
@@ -100,6 +127,72 @@ class Unhosted(object):
             raise unhosted.http.HttpBadRequest("protocol field is obligatory")
 
         if proto == "UJ/0.2":
-            return self.protocol_0_2.process(request)
+            return self.process_0_2(request)
         else:
             raise unhosted.http.HttpBadRequest("unsupported protocol %s" % proto)
+
+    def process_0_2(self, request):
+        """Process UJ/0.2 request."""
+        import unhosted.http
+        # Get action
+        try:
+            action = request["action"]
+        except KeyError:
+            raise unhosted.http.HttpBadRequest("action field is obligatory")
+
+        try:
+            action = str(action).strip()
+        except (TypeError, ValueError):
+            raise unhosted.http.HttpBadRequest("malformed action: %s" % action)
+
+        if not action:
+            raise unhosted.http.HttpBadRequest("empty action field")
+
+        # Get requested method from the action
+        try:
+            moduleName, procName = action.split(".")
+        except ValueError:
+            raise unhosted.http.HttpBadRequest("malformed action string: %s" % action)
+
+        try:
+            proc = getattr(self.modules[moduleName], procName)
+        except KeyError:
+            raise unhosted.http.HttpBadRequest("module not available: %s" % moduleName)
+        except AttributeError:
+            raise unhosted.http.HttpBadRequest("unsupported action: %s" % procName)
+
+        if not callable(proc):
+            raise unhosted.http.HttpInternalServerError("%s is an attribute" % action)
+
+        return proc(request)
+
+    def fetchAccount(self, request, *otherParams):
+        """Check and fetch account from request."""
+        import unhosted.http
+        try:
+            params = (request["emailUser"], request["emailDomain"],
+                request["storageNode"], request["app"])
+        except KeyError:
+            raise unhosted.http.HttpBadRequest("emailUser, emailDomain, storageNode (or HOST), "
+                + " app (or REFERRER) required for %s action" % request["action"])
+        kwparams = {}
+        for other in otherParams:
+            try:
+                kwparams[other] = request[other]
+            except KeyError:
+                raise unhosted.http.HttpBadRequest("%s required for %s action"
+                    % (other, request["action"]))
+        return self.storage.account(*params, **kwparams)
+
+    def fetchFields(self, request, *fields):
+        """Checks and fetch fields from request."""
+        import unhosted.http
+        result = tuple()
+        for field in fields:
+            try:
+                result += (request[field],)
+            except KeyError:
+                raise unhosted.http.HttpBadRequest("%s required for %s action" %
+                    (field, request["action"]))
+        return result
+

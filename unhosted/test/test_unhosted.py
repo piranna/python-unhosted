@@ -24,6 +24,7 @@ from twisted.trial import unittest
 import unhosted
 import unhosted.dictstorage
 import unhosted.utils
+import unhosted.modules.keyvalue
 
 class Unhosted_0_2_TestCase(unittest.TestCase):
 
@@ -36,6 +37,7 @@ class Unhosted_0_2_TestCase(unittest.TestCase):
         uh = unhosted.Unhosted(
             unhosted.dictstorage.DictStorage({}),
             unhosted.utils.VoidChecker())
+        uh.registerModule(unhosted.modules.keyvalue.KeyValue_0_2(), ["KV"])
 
         request = {
             "protocol"      : "UJ/0.2",
@@ -57,6 +59,7 @@ class Unhosted_0_2_TestCase(unittest.TestCase):
         uh = unhosted.Unhosted(
             unhosted.dictstorage.DictStorage({}),
             unhosted.utils.VoidChecker())
+        uh.registerModule(unhosted.modules.keyvalue.KeyValue_0_2(), ["KV"])
 
         request = {
             "protocol"      : "UJ/0.2",
