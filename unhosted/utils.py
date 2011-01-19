@@ -71,6 +71,8 @@ class VoidChecker(object):
 
     zope.interface.implements(unhosted.IRegistrationChecker)
 
-    def check(account):
+    def check(self, account):
         """Mark account as checked."""
+        if not unhosted.IAccount.providedBy(account):
+            raise TypeError("1st parameter should provide IAccount")
         pass # TODO
