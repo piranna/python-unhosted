@@ -31,3 +31,11 @@ class UtilsTestCase(unittest.TestCase):
         obj = {"1" : 2, "3" : ["a", None, 42], "4" : None, "5" : "6"}
         json = unhosted.utils.jwrite(obj)
         self.failUnlessEqual(unhosted.utils.jread(json), obj)
+
+    def test_20_md5(self):
+        testData = {
+            ""      : "d41d8cd98f00b204e9800998ecf8427e",
+            "test"  : "098f6bcd4621d373cade4e832627b4f6"
+        }
+        for key, value in testData.iteritems():
+            self.failUnlessEqual(value, unhosted.utils.md5(key).hexdigest())

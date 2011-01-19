@@ -11,14 +11,17 @@ import unhosted
 import unhosted.storage
 import unhosted.utils
 
-class Unhosted_0_2_TestCase(unittest.TestCase):
+class DictStorageTestCase(unittest.TestCase):
 
     def test_10_empty_dict(self):
-        import unhosted
-        import unhosted.storage
-
         # Instance for testing
         storage = unhosted.storage.DictStorage({})
+        assert unhosted.IStorage.providedBy(storage)
+
+        account = storage.account("userName", "userMail", "node", "app")
+        account1 = storage.account("userName1", "userMail", "node", "app")
+        assert unhosted.IAccount.providedBy(account)
+        assert unhosted.IAccount.providedBy(account1)
 
         # Params required
         self.failUnlessRaises(TypeError, storage.get)
@@ -26,11 +29,11 @@ class Unhosted_0_2_TestCase(unittest.TestCase):
         self.failUnlessRaises(TypeError, storage.has)
 
         # Get-set-has
-        self.failIf(storage.has("account", "key"))
-        storage.set("account", "key", "value", "sign")
-        self.failUnless(storage.has("account", "key"))
-        self.failUnlessEqual(storage.get("account", "key"), ("value", "sign"))
-        self.failUnless(storage.has("account", "key"))
-        self.failIf(storage.has("account1", "key"))
-        self.failIf(storage.has("account", "key1"))
-        self.failIf(storage.has("account1", "key1"))
+        self.failIf(storage.has(account, "key"))
+        storage.set(account, "key", "value", "sign")
+        self.failUnless(storage.has(account, "key"))
+        self.failUnlessEqual(storage.get(account, "key"), ("value", "sign"))
+        self.failUnless(storage.has(account, "key"))
+        self.failIf(storage.has(account1, "key"))
+        self.failIf(storage.has(account, "key1"))
+        self.failIf(storage.has(account1, "key1"))
