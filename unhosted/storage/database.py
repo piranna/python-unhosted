@@ -28,6 +28,33 @@ __all__ = ['DatabaseStorage']
 import unhosted
 import zope.interface
 
+
+def runInteraction(method):
+    """Run safe database interaction.
+
+    Calls 'method' argument with specially created cursor and all other
+    parameters passed to this method.
+    Commits on success, rollbacks on raised exception.
+    Propagates any raised exceptions.
+
+    """
+    def wrapped(self, *args, **kwargs):
+        if not callable(method):
+            raise TypeError("method argument must be callable")
+
+        cursor = self._db.cursor()
+        try:
+            result = method(self, cursor, *args, **kwargs)
+        except:
+            self._db.rollback()
+            raise
+
+        self._db.commit()
+        return result
+
+    return wrapped
+
+
 class DatabaseStorage(object):
     """Wrapper storage for any DB-API 2.0 compatible database."""
 
@@ -42,9 +69,15 @@ class DatabaseStorage(object):
         """
         self._db = database
 
+    @runInteraction
     def initializeDB(self):
         """Initialize database for Unhosted."""
-        self._runInteraction(self.__realInitializeDB)
+        cursor.execute("""CREATE TABLE IF NOT EXISTS unhosted (
+            channel varchar(255),
+            path varchar(255),
+            value blob
+            PRIMARY KEY (channel, path)
+        )""")
 
     def get(self, channel, key, default=None):
         """Gets value from storage."""
@@ -58,54 +91,9 @@ class DatabaseStorage(object):
         else:
             return row[0]
 
+    @runInteraction
     def set(self, channel, key, value):
         """Sets value in storage."""
-        self._runInteraction(self.__realSet, channel, key, value)
-
-    def has(self, channel, key):
-        """Checks key presence in storage."""
-        row = self._db.cursor().execute(
-            "select count(*) from unhosted where channel=? and key=?",
-            (channel, key)
-        ).fetchone()
-        return row[0] > 0
-
-    # Protected
-
-    def _runInteraction(self, call, *args, **kwargs):
-        """Run safe database interaction.
-
-        Calls 'call' argument with specially created cursor and all other
-        parameters passed to this method.
-        Commits on success, rollbacks on raised exception.
-        Propagates any raised exceptions.
-
-        """
-        if not callable(call):
-            raise TypeError("call argument must be callable")
-
-        cursor = self._db.cursor()
-        try:
-            result = call(cursor, *args, **kwargs)
-        except:
-            self._db.rollback()
-            raise
-
-        self._db.commit()
-        return result
-
-    # Private
-
-    def __realInitializeDB(self, cursor):
-        """Initialize database for Unhosted (private method)."""
-        cursor.execute("""CREATE TABLE IF NOT EXISTS unhosted (
-            channel varchar(255),
-            path varchar(255),
-            value blob
-            PRIMARY KEY (channel, path)
-        )""")
-
-    def __realSet(self, cursor, channel, key, value):
         row = cursor.execute("select count(*) from unhosted channel=? and key=?",
             (channel, key))
         if row[0] > 0:
@@ -115,3 +103,10 @@ class DatabaseStorage(object):
             cursor.execute("insert into unhosted (value, channel, path) values (?,?,?)",
                 (value, channel, key))
 
+    def has(self, channel, key):
+        """Checks key presence in storage."""
+        row = self._db.cursor().execute(
+            "select count(*) from unhosted where channel=? and key=?",
+            (channel, key)
+        ).fetchone()
+        return row[0] > 0
