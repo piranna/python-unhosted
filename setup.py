@@ -32,7 +32,7 @@ setup(
     author='Dmitry "Divius" Tantsur',
     author_email='divius.inside@gmail.com',
     url='http://code.google.com/p/python-unhosted',
-    packages=['unhosted'],
+    packages=['unhosted', 'unhosted.test'],
     provides=['unhosted'],
     classifiers=[
         'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
