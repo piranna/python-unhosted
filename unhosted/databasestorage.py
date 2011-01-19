@@ -19,54 +19,14 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-"""This package implements some storage classes for Unhosted.
+"""This package implements storage in DB-API 2.0 database for Unhosted.
 
 """
 
-__all__ = ['DatabaseStorage', 'DictStorage']
+__all__ = ['DatabaseStorage']
 
 import unhosted
 import zope.interface
-
-class DictStorage(object):
-    """Wrapper around any dict-like object."""
-
-    zope.interface.implements(unhosted.IStorage)
-
-    class Account(object):
-        """Account for DictStorage."""
-
-        zope.interface.implements(unhosted.IAccount)
-
-    def __init__(self, initial=None):
-        """C-tor.
-
-        Second parameter is initial value of dictionary:
-        {channel : {key : value}}
-
-        """
-        self._dict = initial or {}
-
-    def get(self, account, key):
-        """Gets value from storage."""
-        channel = str(account)
-        return self._dict.get(channel, {}).get(key, (None, None))
-
-    def set(self, account, key, value, signature):
-        """Sets value in storage."""
-        channel = str(account)
-        if not channel in self._dict:
-            self._dict[channel] = {}
-        self._dict[channel][key] = (value, signature)
-
-    def has(self, account, key):
-        """Checks key presence in storage."""
-        channel = str(account)
-        return channel in self._dict and key in self._dict[channel]
-
-    def account(self, userName, userDomain, node, application, **kwargs):
-        """Create an account."""
-        return self.Account()
 
 class DatabaseStorage(object):
     """Wrapper storage for any DB-API 2.0 compatible database."""

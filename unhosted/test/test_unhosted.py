@@ -22,19 +22,19 @@
 from twisted.trial import unittest
 
 import unhosted
-import unhosted.storage
+import unhosted.dictstorage
 import unhosted.utils
 
 class Unhosted_0_2_TestCase(unittest.TestCase):
 
     def test_10_unhosted_instance(self):
         uh = unhosted.Unhosted(
-            unhosted.storage.DictStorage({}),
+            unhosted.dictstorage.DictStorage({}),
             unhosted.utils.VoidChecker())
 
     def test_20_KV_GET_empty(self):
         uh = unhosted.Unhosted(
-            unhosted.storage.DictStorage({}),
+            unhosted.dictstorage.DictStorage({}),
             unhosted.utils.VoidChecker())
 
         request = {
@@ -55,7 +55,7 @@ class Unhosted_0_2_TestCase(unittest.TestCase):
 
     def test_30_KV_GET_SET(self):
         uh = unhosted.Unhosted(
-            unhosted.storage.DictStorage({}),
+            unhosted.dictstorage.DictStorage({}),
             unhosted.utils.VoidChecker())
 
         request = {

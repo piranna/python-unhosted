@@ -19,11 +19,15 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
+import zope.interface
 from twisted.trial import unittest
 
 import unhosted
-import unhosted.storage
 import unhosted.utils
+
+class DummyAccount(object):
+
+    zope.interface.implements(unhosted.IAccount)
 
 class UtilsTestCase(unittest.TestCase):
 
@@ -39,3 +43,9 @@ class UtilsTestCase(unittest.TestCase):
         }
         for key, value in testData.iteritems():
             self.failUnlessEqual(value, unhosted.utils.md5(key).hexdigest())
+
+    def test_30_void_account_checker(self):
+        checker = unhosted.utils.VoidChecker()
+        self.failUnlessRaises(TypeError, checker.check, None)
+        self.failUnlessRaises(TypeError, checker.check, "string")
+        self.failUnlessEqual(checker.check(DummyAccount()), None)
