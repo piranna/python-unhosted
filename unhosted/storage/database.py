@@ -39,12 +39,8 @@ def runInteraction(method):
 
     """
     def wrapped(self, *args, **kwargs):
-        if not callable(method):
-            raise TypeError("method argument must be callable")
-
-        cursor = self._db.cursor()
         try:
-            result = method(self, cursor, *args, **kwargs)
+            result = method(self,cursor=self._db.cursor(), *args,**kwargs)
         except:
             self._db.rollback()
             raise
@@ -70,8 +66,11 @@ class DatabaseStorage(object):
         self._db = database
 
     @runInteraction
-    def initializeDB(self):
+    def initializeDB(self, cursor=None):
         """Initialize database for Unhosted."""
+        if not cursor:
+            cursor = self._db.cursor()
+
         cursor.execute("""CREATE TABLE IF NOT EXISTS unhosted (
             channel varchar(255),
             path varchar(255),
@@ -79,34 +78,40 @@ class DatabaseStorage(object):
             PRIMARY KEY (channel, path)
         )""")
 
-    def get(self, channel, key, default=None):
+    def get(self, channel, key, default=None, cursor=None):
         """Gets value from storage."""
-        row = self._db.cursor().execute(
-            "select value from unhosted where channel=? and key=?",
-            (channel, key)
+        if not cursor:
+            cursor = self._db.cursor()
+
+        row = cursor.execute("select value from unhosted where channel=? and key=?",
+                             (channel, key)
         ).fetchone()
 
         if row is None:
             return default
-        else:
-            return row[0]
+        return row[0]
 
     @runInteraction
-    def set(self, channel, key, value):
+    def set(self, channel, key, value, cursor=None):
         """Sets value in storage."""
+        if not cursor:
+            cursor = self._db.cursor()
+
         row = cursor.execute("select count(*) from unhosted channel=? and key=?",
-            (channel, key))
+                             (channel, key))
         if row[0] > 0:
             cursor.execute("update unhosted set value=? channel=? and key=?",
-                (value, channel, key))
+                           (value, channel, key))
         else:
             cursor.execute("insert into unhosted (value, channel, path) values (?,?,?)",
-                (value, channel, key))
+                           (value, channel, key))
 
-    def has(self, channel, key):
+    def has(self, channel, key, cursor=None):
         """Checks key presence in storage."""
-        row = self._db.cursor().execute(
-            "select count(*) from unhosted where channel=? and key=?",
-            (channel, key)
+        if not cursor:
+            cursor = self._db.cursor()
+
+        row = cursor.execute("select count(*) from unhosted where channel=? and key=?",
+                             (channel, key)
         ).fetchone()
         return row[0] > 0
