@@ -22,7 +22,7 @@
 from twisted.trial import unittest
 
 import unhosted
-import unhosted.dictstorage
+import unhosted.storage.dict
 import unhosted.utils
 import unhosted.modules.keyvalue
 
@@ -30,12 +30,12 @@ class Unhosted_0_2_TestCase(unittest.TestCase):
 
     def test_10_unhosted_instance(self):
         uh = unhosted.Unhosted(
-            unhosted.dictstorage.DictStorage({}),
+            unhosted.storage.dict.DictStorage({}),
             unhosted.utils.VoidChecker())
 
     def test_20_KV_GET_empty(self):
         uh = unhosted.Unhosted(
-            unhosted.dictstorage.DictStorage({}),
+            unhosted.storage.dict.DictStorage({}),
             unhosted.utils.VoidChecker())
         uh.registerModule(unhosted.modules.keyvalue.KeyValue_0_2(), ["KV"])
 
@@ -57,7 +57,7 @@ class Unhosted_0_2_TestCase(unittest.TestCase):
 
     def test_30_KV_GET_SET(self):
         uh = unhosted.Unhosted(
-            unhosted.dictstorage.DictStorage({}),
+            unhosted.storage.dict.DictStorage({}),
             unhosted.utils.VoidChecker())
         uh.registerModule(unhosted.modules.keyvalue.KeyValue_0_2(), ["KV"])
 

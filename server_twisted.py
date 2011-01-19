@@ -6,7 +6,8 @@ from twisted.internet import reactor
 from twisted.web.server import Site
 from twisted.web.static import File
 
-from unhosted import Unhosted, databasestorage,txUnhosted,utils
+from unhosted import Unhosted, txUnhosted,utils
+from unhosted.storage import database
 
 
 # Command line arguments
@@ -18,12 +19,12 @@ parser.add_argument('--rootdir', default='.',
 args = parser.parse_args()
 
 # Connect database and UnHosted interface
-db = databasestorage.DatabaseStorage(sqlite3.connect(args.database))
+db = database.DatabaseStorage(sqlite3.connect(args.database))
 uh = Unhosted(db, utils.VoidChecker())
 
 # Serve webpages and UnHosted RPC
 root = File(args.rootdir)
-root.putChild("unhosted", tx.UnhostedResource(uh))
+root.putChild("unhosted", txUnhosted.UnhostedResource(uh))
 
 # Start server
 reactor.listenTCP(8080, Site(root))
