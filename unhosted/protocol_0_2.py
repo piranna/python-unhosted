@@ -33,15 +33,15 @@ class KV(object):
 
     def GET(self, request):
         """KV.GET"""
-        (keyPath,) = self._processor._fetchFields(request, "keyPath")
-        acc = self._processor._fetchAccount(request, "subPass")
+        (keyPath,) = self._processor.fetchFields(request, "keyPath")
+        acc = self._processor.fetchAccount(request, "subPass")
         value, signature = self._processor.unhosted.storage.get(acc, keyPath)
         return {"value" : value, "PubSign/0.2" : signature}
 
     def SET(self, request):
         """KV.SET"""
-        (keyPath, value, PubSign) = self._processor._fetchFields(request, "keyPath", "value", "PubSign")
-        acc = self._processor._fetchAccount(request, "pubPass")
+        (keyPath, value, PubSign) = self._processor.fetchFields(request, "keyPath", "value", "PubSign")
+        acc = self._processor.fetchAccount(request, "pubPass")
         return self._processor.unhosted.storage.set(acc, keyPath, value, PubSign)
 
 
@@ -80,14 +80,13 @@ class Unhosted_0_2(object):
             raise unhosted.http.HttpBadRequest("module not available: %s" % action[0])
         except AttributeError:
             raise unhosted.http.HttpBadRequest("unsupported action: %s" % action)
-        except TypeError:
+
+        if not callable(proc):
             raise unhosted.http.HttpInternalServerError("%s is an attribute" % action)
 
         return proc(request)
 
-    # Protected
-
-    def _fetchAccount(self, request, *otherParams):
+    def fetchAccount(self, request, *otherParams):
         """Check and fetch account from request."""
         try:
             params = (request["emailUser"], request["emailDomain"],
@@ -104,7 +103,7 @@ class Unhosted_0_2(object):
                     % (other, request["action"]))
         return self.unhosted.storage.account(*params, **kwparams)
 
-    def _fetchFields(self, request, *fields):
+    def fetchFields(self, request, *fields):
         """Checks and fetch fields from request."""
         result = tuple()
         for field in fields:
