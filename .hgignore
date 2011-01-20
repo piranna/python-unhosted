@@ -1,0 +1,7 @@
+syntax: glob
+*.pyc
+*.pyo
+_trial_temp
+build
+dist
+MANIFEST
