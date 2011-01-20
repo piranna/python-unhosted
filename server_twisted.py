@@ -6,7 +6,7 @@ from twisted.internet import reactor
 from twisted.web.server import Site
 from twisted.web.static import File
 
-from unhosted import Unhosted, txUnhosted,utils
+from unhosted import Unhosted, tx, utils
 from unhosted.storage import database
 
 
@@ -24,7 +24,7 @@ uh = Unhosted(db, utils.VoidChecker())
 
 # Serve webpages and UnHosted RPC
 root = File(args.rootdir)
-root.putChild("unhosted", txUnhosted.UnhostedResource(uh))
+root.putChild("unhosted", tx.UnhostedResource(uh))
 
 # Start server
 reactor.listenTCP(8080, Site(root))
