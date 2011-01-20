@@ -6,7 +6,7 @@ from twisted.internet import reactor
 from twisted.web.server import Site
 from twisted.web.static import File
 
-from unhosted import Unhosted, databasestorage,txUnhosted,utils
+from unhosted import Unhosted, databasestorage,tx,utils
 
 
 # Command line arguments
