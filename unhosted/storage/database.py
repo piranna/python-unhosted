@@ -28,7 +28,6 @@ __all__ = ['DatabaseStorage']
 import unhosted
 import zope.interface
 
-
 def runInteraction(method):
     """Run safe database interaction.
 
@@ -40,7 +39,7 @@ def runInteraction(method):
     """
     def wrapped(self, *args, **kwargs):
         try:
-            result = method(self,cursor=self._db.cursor(), *args,**kwargs)
+            result = method(self, cursor=self._db.cursor(), *args, **kwargs)
         except:
             self._db.rollback()
             raise
