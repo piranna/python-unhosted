@@ -8,14 +8,14 @@
 from twisted.trial import unittest
 
 import unhosted
-import unhosted.storage.dict
+import unhosted.storage.dictionary
 import unhosted.utils
 
 class DictStorageTestCase(unittest.TestCase):
 
     def test_10_empty_dict(self):
         # Instance for testing
-        storage = unhosted.storage.dict.DictStorage({})
+        storage = unhosted.storage.dictionary.DictionaryStorage({})
         assert unhosted.interfaces.IStorage.providedBy(storage)
 
         account = storage.account("userName", "userMail", "node", "app")
