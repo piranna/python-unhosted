@@ -27,7 +27,7 @@ import unhosted.utils
 
 class DummyAccount(object):
 
-    zope.interface.implements(unhosted.IAccount)
+    zope.interface.implements(unhosted.interfaces.IAccount)
 
 class UtilsTestCase(unittest.TestCase):
 

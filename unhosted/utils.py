@@ -22,7 +22,7 @@
 """This package contains some utils for Unhosted."""
 
 import zope.interface
-import unhosted
+import unhosted.interfaces
 
 def _detectJSON():
     """Determine what JSON module we have."""
@@ -63,10 +63,10 @@ md5 = _detectMD5()
 class VoidChecker(object):
     """Registration checker that always succeeds."""
 
-    zope.interface.implements(unhosted.IRegistrationChecker)
+    zope.interface.implements(unhosted.interfaces.IRegistrationChecker)
 
     def check(self, account):
         """Mark account as checked."""
-        if not unhosted.IAccount.providedBy(account):
+        if not unhosted.interfaces.IAccount.providedBy(account):
             raise TypeError("1st parameter should provide IAccount")
         pass # TODO

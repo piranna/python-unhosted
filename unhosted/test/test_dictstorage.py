@@ -16,12 +16,12 @@ class DictStorageTestCase(unittest.TestCase):
     def test_10_empty_dict(self):
         # Instance for testing
         storage = unhosted.storage.dict.DictStorage({})
-        assert unhosted.IStorage.providedBy(storage)
+        assert unhosted.interfaces.IStorage.providedBy(storage)
 
         account = storage.account("userName", "userMail", "node", "app")
         account1 = storage.account("userName1", "userMail", "node", "app")
-        assert unhosted.IAccount.providedBy(account)
-        assert unhosted.IAccount.providedBy(account1)
+        assert unhosted.interfaces.IAccount.providedBy(account)
+        assert unhosted.interfaces.IAccount.providedBy(account1)
 
         # Params required
         self.failUnlessRaises(TypeError, storage.get)
