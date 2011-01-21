@@ -29,61 +29,6 @@ __all__ = ['Storage', 'Unhosted']
 __version_info__ = ('0', '2', '0')
 __version__ = '.'.join(__version_info__)
 
-import zope.interface
-
-class IStorage(zope.interface.Interface):
-    """Interface for Unhosted storages."""
-
-    def get(account, key):
-        """Gets (value, signature) from storage or None."""
-
-    def set(account, key, value, signature):
-        """Sets value and signature in storage."""
-
-    def has(account, key):
-        """Checks key presence in storage."""
-
-    def account(userName, userDomain, node, application, **kwargs):
-        """Construct an account for further use in storage.
-
-        This call generally doesn't check for existence and correctness.
-        This checks are done by some call that uses account.
-
-        Returns IAccount. Real type depends on storage implementation.
-
-        """
-
-class IRegistrationChecker(zope.interface.Interface):
-    """Interface for Unhosted account registration checker."""
-
-    def check(account):
-        """Start checking process for account.
-
-        Account should implement IAccount.
-
-        """
-
-class IAccount(zope.interface.Interface):
-    """Interface for Unhosted account.
-
-    Account instances shouldn't be created directly, use IStorage.account()
-    instead.
-
-    """
-
-class IModule(zope.interface.Interface):
-    """Interface for Unhosted module."""
-
-    def initialize(unhosted):
-        """Initialize module for given unhosted instance."""
-
-    def processRequest(request):
-        """Process request for this module.
-
-        Can raise various exceptions from unhosted.http.
-
-        """
-
 class Unhosted(object):
     """Class representing Unhosted engine."""
 
@@ -93,9 +38,10 @@ class Unhosted(object):
         Argument 'storage' should be of type unhosted.Storage.
 
         """
-        if not IStorage.providedBy(storage):
+        from unhosted import interfaces
+        if not interfaces.IStorage.providedBy(storage):
             raise TypeError("storage must provide IStorage")
-        if not IRegistrationChecker.providedBy(registrationChecker):
+        if not interfaces.IRegistrationChecker.providedBy(registrationChecker):
             raise TypeError("registrationChecker must provide IRegistrationChecker")
 
         self.storage = storage
@@ -104,7 +50,8 @@ class Unhosted(object):
 
     def registerModule(self, module, names):
         """Register module instance for given module names."""
-        if not IModule.providedBy(module):
+        from unhosted import interfaces
+        if not interfaces.IModule.providedBy(module):
             raise TypeError("module must provide IModule")
         if not isinstance(names, list):
             raise TypeError("names must be a list of strings")

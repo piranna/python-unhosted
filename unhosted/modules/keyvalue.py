@@ -23,13 +23,13 @@
 
 import zope.interface
 
-import unhosted
+import unhosted.interfaces
 import unhosted.http
 
 class KeyValue_0_2(object):
     """KeyValue-0.2 module."""
 
-    zope.interface.implements(unhosted.IModule)
+    zope.interface.implements(unhosted.interfaces.IModule)
 
     def initialize(self, unhosted):
         """Initialize module for given unhosted instance."""
