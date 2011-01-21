@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Python library for Unhosted storage node - additional storage classes.
+# Python library for Unhosted storage node - database storage class.
 # Copyright 2010 Dmitrij "Divius" Tantsur <divius.inside@gmail.com>
 #
 # This library is free software; you can redistribute it and/or

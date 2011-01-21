@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Python library for Unhosted storage node - UJ/0.2 implementation.
+# Python library for Unhosted storage node - KeyValue-0.2 implementation.
 # Copyright 2010 Dmitrij "Divius" Tantsur <divius.inside@gmail.com>
 #
 # This library is free software; you can redistribute it and/or
