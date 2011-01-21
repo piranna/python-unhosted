@@ -18,8 +18,8 @@ class DictStorageTestCase(unittest.TestCase):
         storage = unhosted.storage.dictionary.DictionaryStorage({})
         assert unhosted.interfaces.IStorage.providedBy(storage)
 
-        account = storage.account("userName", "userMail", "node", "app")
-        account1 = storage.account("userName1", "userMail", "node", "app")
+        account = storage.account("userName", "node", "app")
+        account1 = storage.account("userName1", "node", "app")
         assert unhosted.interfaces.IAccount.providedBy(account)
         assert unhosted.interfaces.IAccount.providedBy(account1)
 

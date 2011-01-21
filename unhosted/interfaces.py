@@ -23,7 +23,7 @@
 
 """
 
-__all__ = []
+__all__ = ['IStorage', 'IRegistrationChecker', 'IAccount', 'IModule']
 
 from zope import interface
 
@@ -39,7 +39,7 @@ class IStorage(interface.Interface):
     def has(account, key):
         """Checks key presence in storage."""
 
-    def account(userName, userDomain, node, application, **kwargs):
+    def account(user, node, application, **kwargs):
         """Construct an account for further use in storage.
 
         This call generally doesn't check for existence and correctness.
@@ -73,9 +73,11 @@ class IModule(interface.Interface):
     def initialize(unhosted):
         """Initialize module for given unhosted instance."""
 
-    def processRequest(request):
-        """Process request for this module.
+    def processCommand(storageNode, app, command):
+        """Process single command for this module.
 
         Can raise various exceptions from unhosted.http.
+        Any exceptions that are not derived from unhosted.http.HttpStatus
+        will be converted by calling code into unhosted.http.HttpInternalServerError.
 
         """
