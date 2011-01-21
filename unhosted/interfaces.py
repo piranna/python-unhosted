@@ -73,7 +73,7 @@ class IModule(interface.Interface):
     def initialize(unhosted):
         """Initialize module for given unhosted instance."""
 
-    def processCommand(storageNode, app, command):
+    def processCommand(request, command):
         """Process single command for this module.
 
         Can raise various exceptions from unhosted.http.
