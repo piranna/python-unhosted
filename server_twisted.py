@@ -8,7 +8,7 @@ from twisted.web.static import File
 
 from unhosted import Unhosted, tx, utils
 from unhosted.storage import database
-
+from unhosted.modules import keyvalue
 
 # Command line arguments
 parser = argparse.ArgumentParser(description='UnHosted node and webpages server.')
@@ -21,6 +21,7 @@ args = parser.parse_args()
 # Connect database and UnHosted interface
 db = database.DatabaseStorage(sqlite3.connect(args.database))
 uh = Unhosted(db, utils.VoidChecker())
+uh.registerModule(keyvalue.KeyValue_0_2(), ["KeyValue-0.2"])
 
 # Serve webpages and UnHosted RPC
 root = File(args.rootdir)

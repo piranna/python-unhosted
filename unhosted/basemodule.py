@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Python library for Unhosted storage node - interfaces.
+# Python library for Unhosted storage node - base class for module.
 # Copyright 2010 Dmitrij "Divius" Tantsur <divius.inside@gmail.com>
 #
 # This library is free software; you can redistribute it and/or
