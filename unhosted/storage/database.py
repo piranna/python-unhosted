@@ -25,8 +25,8 @@
 
 __all__ = ['DatabaseStorage']
 
+from zope import interface
 import unhosted.interfaces
-import zope.interface
 
 def runInteraction(method):
     """Run safe database interaction.
@@ -49,11 +49,10 @@ def runInteraction(method):
 
     return wrapped
 
-
 class DatabaseStorage(object):
     """Wrapper storage for any DB-API 2.0 compatible database."""
 
-    zope.interface.implements(unhosted.interfaces.IStorage)
+    interface.implements(unhosted.interfaces.IStorage)
 
     def __init__(self, database):
         """C-tor.

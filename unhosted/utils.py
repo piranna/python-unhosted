@@ -21,7 +21,7 @@
 
 """This package contains some utils for Unhosted."""
 
-import zope.interface
+from zope import interface
 import unhosted.interfaces
 
 def _detectJSON():
@@ -63,7 +63,7 @@ md5 = _detectMD5()
 class VoidChecker(object):
     """Registration checker that always succeeds."""
 
-    zope.interface.implements(unhosted.interfaces.IRegistrationChecker)
+    interface.implements(unhosted.interfaces.IRegistrationChecker)
 
     def check(self, account):
         """Mark account as checked."""

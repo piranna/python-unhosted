@@ -25,18 +25,18 @@
 
 __all__ = ['DictStorage']
 
+from zope import interface
 import unhosted.interfaces
-import zope.interface
 
 class DictStorage(object):
     """Wrapper around any dict-like object."""
 
-    zope.interface.implements(unhosted.interfaces.IStorage)
+    interface.implements(unhosted.interfaces.IStorage)
 
     class Account(object):
         """Account for DictStorage."""
 
-        zope.interface.implements(unhosted.interfaces.IAccount)
+        interface.implements(unhosted.interfaces.IAccount)
 
     def __init__(self, initial=None):
         """C-tor.
