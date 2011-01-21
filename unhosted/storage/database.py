@@ -19,8 +19,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-"""This package implements storage in DB-API 2.0 database for Unhosted.
-
+"""
+This package implements storage in DB-API 2.0 database for Unhosted.
 """
 
 __all__ = ['DatabaseStorage']
@@ -28,15 +28,17 @@ __all__ = ['DatabaseStorage']
 from zope import interface
 import unhosted.interfaces
 
+
 def runInteraction(method):
-    """Run safe database interaction.
+    '''
+    Run safe database interaction.
 
     Calls 'method' argument with specially created cursor and all other
     parameters passed to this method.
     Commits on success, rollbacks on raised exception.
     Propagates any raised exceptions.
+    '''
 
-    """
     def wrapped(self, *args, **kwargs):
         try:
             result = method(self, cursor=self._db.cursor(), *args, **kwargs)
@@ -50,66 +52,91 @@ def runInteraction(method):
     return wrapped
 
 class DatabaseStorage(object):
-    """Wrapper storage for any DB-API 2.0 compatible database."""
+    '''
+    Wrapper storage for any DB-API 2.0 compatible database.
+    '''
 
     interface.implements(unhosted.interfaces.IStorage)
 
     def __init__(self, database):
-        """C-tor.
+        '''
+        C-tor.
 
         Argument 'database' should be any DB-API 2.0 compatible connection.
         You may need to call initializeDB() to create all required tables.
+        '''
 
-        """
         self._db = database
+
 
     @runInteraction
     def initializeDB(self, cursor=None):
-        """Initialize database for Unhosted."""
+        '''
+        Initialize database for Unhosted.
+        '''
         if not cursor:
             cursor = self._db.cursor()
 
-        cursor.execute("""CREATE TABLE IF NOT EXISTS unhosted (
-            channel varchar(255),
-            path varchar(255),
-            value blob
-            PRIMARY KEY (channel, path)
-        )""")
+        cursor.execute(
+        """ CREATE TABLE IF NOT EXISTS unhosted
+            (
+                channel varchar(255),
+                path varchar(255),
+                value blob
+
+                PRIMARY KEY(channel, path)
+            )""")
+
 
     def get(self, channel, key, default=None, cursor=None):
         """Gets value from storage."""
         if not cursor:
             cursor = self._db.cursor()
 
-        row = cursor.execute("select value from unhosted where channel=? and key=?",
-                             (channel, key)
-        ).fetchone()
+        row = cursor.execute(
+        """ SELECT value FROM unhosted
+            WHERE channel=? AND key=?
+            LIMIT 1
+        """,(channel, key)).fetchone()
 
         if row is None:
             return default
         return row[0]
 
+
     @runInteraction
     def set(self, channel, key, value, cursor=None):
-        """Sets value in storage."""
+        '''
+        Sets value in storage.
+        '''
         if not cursor:
             cursor = self._db.cursor()
 
-        row = cursor.execute("select count(*) from unhosted channel=? and key=?",
-                             (channel, key))
-        if row[0] > 0:
-            cursor.execute("update unhosted set value=? channel=? and key=?",
-                           (value, channel, key))
+        if self.has(channel, key, cursor):
+            cursor.execute(
+            """ UPDATE unhosted
+                SET value=? channel=? AND key=?
+                LIMIT 1
+            """,(value, channel, key))
         else:
-            cursor.execute("insert into unhosted (value, channel, path) values (?,?,?)",
-                           (value, channel, key))
+            cursor.execute(
+            """ INSERT INTO unhosted(value, channel, path)
+                VALUES(?,?,?)
+                LIMIT 1
+            """,(value, channel, key))
+
 
     def has(self, channel, key, cursor=None):
-        """Checks key presence in storage."""
+        '''
+        Checks key presence in storage.
+        '''
         if not cursor:
             cursor = self._db.cursor()
 
-        row = cursor.execute("select count(*) from unhosted where channel=? and key=?",
-                             (channel, key)
-        ).fetchone()
+        row = cursor.execute(
+        """ SELECT COUNT(*) FROM unhosted
+            WHERE channel=? AND key=?
+            LIMIT 1
+        """,(channel, key)).fetchone()
+
         return row[0] > 0
