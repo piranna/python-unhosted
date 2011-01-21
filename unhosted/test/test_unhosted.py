@@ -37,41 +37,42 @@ class Unhosted_0_2_TestCase(unittest.TestCase):
         uh = unhosted.Unhosted(
             unhosted.storage.dictionary.DictionaryStorage({}),
             unhosted.utils.VoidChecker())
-        uh.registerModule(unhosted.modules.keyvalue.KeyValue_0_2(), ["KV"])
+        uh.registerModule(unhosted.modules.keyvalue.KeyValue_0_2(), ["KeyValue-0.2"])
 
         request = {
-            "protocol"      : "UJ/0.2",
-            "emailUser"     : "testUser",
-            "emailDomain"   : "testDomain",
+            "protocol"      : "KeyValue-0.2",
             "storageNode"   : "testNode",
             "app"           : "testApp",
-            "action"        : "KV.GET",
-            "keyPath"       : "test",
-            "subPass"       : "testPassword"
+            "command"       : {
+                "method"    : "GET",
+                "user"      : "testUser",
+                "keyHash"   : "testKey"
+            }
         }
 
         response = uh.processRequest(request)
         self.failUnlessIsInstance(response, dict)
         self.failUnlessEqual(response["value"], None)
-        self.failUnlessEqual(response["PubSign/0.2"], None)
+        self.failUnlessEqual(response["PubSign"], None)
 
     def test_30_KV_GET_SET(self):
         uh = unhosted.Unhosted(
             unhosted.storage.dictionary.DictionaryStorage({}),
             unhosted.utils.VoidChecker())
-        uh.registerModule(unhosted.modules.keyvalue.KeyValue_0_2(), ["KV"])
+        uh.registerModule(unhosted.modules.keyvalue.KeyValue_0_2(), ["KeyValue-0.2"])
 
         request = {
-            "protocol"      : "UJ/0.2",
-            "emailUser"     : "testUser",
-            "emailDomain"   : "testDomain",
+            "protocol"      : "KeyValue-0.2",
             "storageNode"   : "testNode",
             "app"           : "testApp",
-            "action"        : "KV.SET",
-            "keyPath"       : "test",
-            "pubPass"       : "testPassword",
-            "value"         : "testValue",
-            "PubSign/0.2"   : "testSign"
+            "command"       : {
+                "method"    : "SET",
+                "user"      : "testUser",
+                "keyHash"   : "testKey",
+                "value"     : "testValue"
+            },
+            "password"      : "testPassword",
+            "pubSign"       : "testSign"
         }
 
         response = uh.processRequest(request)
@@ -79,17 +80,17 @@ class Unhosted_0_2_TestCase(unittest.TestCase):
         self.failUnlessEqual(response, {})
 
         request = {
-            "protocol"      : "UJ/0.2",
-            "emailUser"     : "testUser",
-            "emailDomain"   : "testDomain",
+            "protocol"      : "KeyValue-0.2",
             "storageNode"   : "testNode",
             "app"           : "testApp",
-            "action"        : "KV.GET",
-            "keyPath"       : "test",
-            "subPass"       : "testPassword"
+            "command"       : {
+                "method"    : "GET",
+                "user"      : "testUser",
+                "keyHash"   : "testKey"
+            }
         }
 
         response = uh.processRequest(request)
         self.failUnlessIsInstance(response, dict)
         self.failUnlessEqual(response["value"], "testValue")
-        self.failUnlessEqual(response["PubSign/0.2"], "testSign")
+        self.failUnlessEqual(response["PubSign"], "testSign")

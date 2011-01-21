@@ -64,7 +64,7 @@ class DictionaryStorage(object):
         channel = str(account)
         return channel in self._dict and key in self._dict[channel]
 
-    def account(self, userName, userDomain, node, application, **kwargs):
+    def account(self, user, node, application, **kwargs):
         """Create an account."""
         return self.Account()
 

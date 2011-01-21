@@ -34,20 +34,54 @@ class KeyValue_0_2(object):
     def initialize(self, unhosted):
         """Initialize module for given unhosted instance."""
         self.unhosted = unhosted
+        self.methods = {
+            "GET"   : self._get,
+            "SET"   : self._set
+        }
 
-    def processRequest(self, request):
-        """Process request for this module."""
+    def processCommand(self, request, command):
+        """Process single command for this module."""
+        try:
+            method = command["method"]
+        except KeyError:
+            raise unhosted.http.HttpBadRequest(
+                "method field is obligatory for KeyValue-0.2")
 
-    def GET(self, request):
-        """KV.GET"""
-        (keyPath,) = self.unhosted.fetchFields(request, "keyPath")
-        acc = self.unhosted.fetchAccount(request, "subPass")
-        value, signature = self.unhosted.storage.get(acc, keyPath)
-        return {"value" : value, "PubSign/0.2" : signature}
+        try:
+            method = self.methods[method]
+        except KeyError:
+            raise unhosted.http.HttpBadRequest(
+                "unsupported method for KeyValue-0.2: %s" % method)
 
-    def SET(self, request):
-        """KV.SET"""
-        (keyPath, value, PubSign) = self.unhosted.fetchFields(request, "keyPath", "value", "PubSign/0.2")
-        acc = self.unhosted.fetchAccount(request, "pubPass")
-        self.unhosted.storage.set(acc, keyPath, value, PubSign)
+        return method(request, command)
+
+    def _get(self, request, command):
+        """GET."""
+        try:
+            key, user, node, app = \
+                command["keyHash"], command["user"], \
+                request["storageNode"], request["app"]
+        except KeyError:
+            raise unhosted.http.HttpBadRequest(
+                "the following fields are obligatory for KeyValue-0.2 GET: "
+                "command.keyHash, command.user, storageNode, app")
+
+        acc = self.unhosted.storage.account(user, node, app)
+        value, signature = self.unhosted.storage.get(acc, key)
+        return {"value" : value, "PubSign" : signature}
+
+    def _set(self, request, command):
+        """SET."""
+        try:
+            key, user, value, node, app, password, pubSign = \
+                command["keyHash"], command["user"], command["value"], \
+                request["storageNode"], request["app"], \
+                request["password"], request["pubSign"]
+        except KeyError:
+            raise unhosted.http.HttpBadRequest(
+                "the following fields are obligatory for KeyValue-0.2 SET: "
+                "command.keyHash, command.user, storageNode, app, password")
+
+        acc = self.unhosted.storage.account(user, node, app, password=password)
+        self.unhosted.storage.set(acc, key, value, pubSign)
         return {}

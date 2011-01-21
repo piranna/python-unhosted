@@ -25,7 +25,7 @@ This package exports Unhosted and Storage classes.
 
 """
 
-__all__ = ['Storage', 'Unhosted']
+__all__ = ['Unhosted']
 __version_info__ = ('0', '2', '0')
 __version__ = '.'.join(__version_info__)
 
@@ -64,82 +64,31 @@ class Unhosted(object):
 
     def processRequest(self, request):
         """Process RPC request (either json string or dict)."""
-        if isinstance(request, str):
+        if isinstance(request, basestring):
             import unhosted.utils
-            request = unhosted.utils.jread(request)
-        import unhosted.http
-        try:
-            proto = request["protocol"]
-        except KeyError:
-            raise unhosted.http.HttpBadRequest("protocol field is obligatory")
+            try:
+                request = unhosted.utils.jread(request)
+            except unhosted.utils.JReadError:
+                raise unhosted.http.HttpBadRequest("cannot parse request")
 
-        if proto == "UJ/0.2":
-            return self.process_0_2(request)
-        else:
+        import unhosted.http
+
+        try:
+            proto, command = request["protocol"], request["command"]
+        except KeyError:
+            raise unhosted.http.HttpBadRequest(
+                "the following fields are obligatory: protocol, command")
+
+        try:
+            module = self.modules[proto]
+        except KeyError:
             raise unhosted.http.HttpBadRequest("unsupported protocol %s" % proto)
 
-    def process_0_2(self, request):
-        """Process UJ/0.2 request."""
-        import unhosted.http
-        # Get action
-        try:
-            action = request["action"]
-        except KeyError:
-            raise unhosted.http.HttpBadRequest("action field is obligatory")
-
-        try:
-            action = str(action).strip()
-        except (TypeError, ValueError):
-            raise unhosted.http.HttpBadRequest("malformed action: %s" % action)
-
-        if not action:
-            raise unhosted.http.HttpBadRequest("empty action field")
-
-        # Get requested method from the action
-        try:
-            moduleName, procName = action.split(".")
-        except ValueError:
-            raise unhosted.http.HttpBadRequest("malformed action string: %s" % action)
-
-        try:
-            proc = getattr(self.modules[moduleName], procName)
-        except KeyError:
-            raise unhosted.http.HttpBadRequest("module not available: %s" % moduleName)
-        except AttributeError:
-            raise unhosted.http.HttpBadRequest("unsupported action: %s" % procName)
-
-        if not callable(proc):
-            raise unhosted.http.HttpInternalServerError("%s is an attribute" % action)
-
-        return proc(request)
-
-    def fetchAccount(self, request, *otherParams):
-        """Check and fetch account from request."""
-        import unhosted.http
-        try:
-            params = (request["emailUser"], request["emailDomain"],
-                request["storageNode"], request["app"])
-        except KeyError:
-            raise unhosted.http.HttpBadRequest("emailUser, emailDomain, storageNode (or HOST), "
-                + " app (or REFERRER) required for %s action" % request["action"])
-        kwparams = {}
-        for other in otherParams:
+        if isinstance(command, basestring):
+            import unhosted.utils
             try:
-                kwparams[other] = request[other]
-            except KeyError:
-                raise unhosted.http.HttpBadRequest("%s required for %s action"
-                    % (other, request["action"]))
-        return self.storage.account(*params, **kwparams)
+                command = unhosted.utils.jread(command)
+            except unhosted.utils.JReadError:
+                raise unhosted.http.HttpBadRequest("cannot parse command field")
 
-    def fetchFields(self, request, *fields):
-        """Checks and fetch fields from request."""
-        import unhosted.http
-        result = tuple()
-        for field in fields:
-            try:
-                result += (request[field],)
-            except KeyError:
-                raise unhosted.http.HttpBadRequest("%s required for %s action" %
-                    (field, request["action"]))
-        return result
-
+        return module.processCommand(request, command)
