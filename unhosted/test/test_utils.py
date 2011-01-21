@@ -19,7 +19,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-import zope.interface
+from zope import interface
 from twisted.trial import unittest
 
 import unhosted
@@ -27,7 +27,7 @@ import unhosted.utils
 
 class DummyAccount(object):
 
-    zope.interface.implements(unhosted.interfaces.IAccount)
+    interface.implements(unhosted.interfaces.IAccount)
 
 class UtilsTestCase(unittest.TestCase):
 

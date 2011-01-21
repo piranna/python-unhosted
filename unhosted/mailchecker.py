@@ -25,10 +25,10 @@
 
 __all__ = ['IMailer', 'SimpleMailer', 'MailChecker']
 
-import zope.interface
-import unhosted
+from zope import interface
+import unhosted.interfaces
 
-class IMailer(zope.interface.Interface):
+class IMailer(interface.Interface):
     """Interface for Unhosted mailers."""
 
     def mailto(fromaddr, toaddr, message):
@@ -37,7 +37,7 @@ class IMailer(zope.interface.Interface):
 class SimpleMailer(object):
     """Mailer via standard smtplib module."""
 
-    zope.interface.implements(IMailer)
+    interface.implements(unhosted.interfaces.IMailer)
 
     def __init__(self, server="localhost"):
         """C-tor with given SMTP server."""
@@ -56,11 +56,11 @@ class SimpleMailer(object):
 class MailChecker(object):
     """Registration checker via email."""
 
-    zope.interface.implements(unhosted.IRegistrationChecker)
+    interface.implements(unhosted.interfaces.IRegistrationChecker)
 
     def __init__(self, mailer, fromaddr="no-reply@unhosted-node"):
         """C-tor with given mailer."""
-        assert IMailer.providedBy(mailer)
+        assert unhosted.interfaces.IMailer.providedBy(mailer)
         self.mailer = mailer
         self.fromaddr = fromaddr
 
