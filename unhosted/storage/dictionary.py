@@ -19,14 +19,15 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-"""This package implements IStorage wrapper for dict-like objects for Unhosted.
-
+"""
+This package implements IStorage wrapper for dict-like objects for Unhosted.
 """
 
 __all__ = ['DictionaryStorage']
 
 from zope import interface
 import unhosted.interfaces
+
 
 class DictionaryStorage(object):
     """Wrapper around any dict-like object."""

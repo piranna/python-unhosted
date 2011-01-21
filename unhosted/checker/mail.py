@@ -53,7 +53,7 @@ class SimpleMailer(object):
         server.sendmail(fromaddr, toaddrs, msg)
         server.quit()
 
-class MailChecker(object):
+class Mail(object):
     """Registration checker via email."""
 
     interface.implements(unhosted.interfaces.IRegistrationChecker)
