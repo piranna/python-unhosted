@@ -42,6 +42,24 @@ class UtilsTestCase(unittest.TestCase):
         self.failUnlessEqual(unhosted.utils.jread(json), obj)
         self.failUnlessEqual(obj["jtest"], jembedded)
 
+        json = "{}"
+        self.failUnlessEqual(unhosted.utils.jread(json), {})
+
+        obj = object()
+        self.failUnlessRaises(unhosted.utils.JWriteError, unhosted.utils.jwrite, obj)
+
+        obj = {"1" : object()}
+        self.failUnlessRaises(unhosted.utils.JWriteError, unhosted.utils.jwrite, obj)
+
+        json = '{"1" : "2", "3" : some shit}'
+        self.failUnlessRaises(unhosted.utils.JReadError, unhosted.utils.jread, json)
+
+        json = '\n'
+        self.failUnlessRaises(unhosted.utils.JReadError, unhosted.utils.jread, json)
+
+        json = ''
+        self.failUnlessRaises(unhosted.utils.JReadError, unhosted.utils.jread, json)
+
     def test_20_md5(self):
         testData = {
             ""      : "d41d8cd98f00b204e9800998ecf8427e",

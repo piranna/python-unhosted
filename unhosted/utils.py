@@ -26,35 +26,29 @@ import unhosted
 
 def _detectJSON():
     """Determine what JSON module we have."""
+    # Try use anyjson to detect the fastest module
     try:
-        # Try use anyjson
         import anyjson
-        return anyjson.deserialize, anyjson.serialize
+        return anyjson.deserialize, anyjson.serialize, ValueError, TypeError
     except (ImportError, AttributeError):
         pass
 
     # Module json is available in standard library
     try:
-        # Try use anyjson
         import json
-        return json.loads, json.dumps
+        return json.loads, json.dumps, ValueError, TypeError
     except (ImportError, AttributeError):
         pass
 
     # Now try minjson from python-json package (available for Python 2.4)
     try:
         import minjson
-    except ImportError:
+        return minjson.read, minjson.write, minjson.ReadException, minjson.WriteException
+    except (ImportError, AttributeError):
         raise ImportError("No JSON modules are present (currently supported: " +
-            + "anyjson, json, minjson")
+            + "anyjson, json (python >= 2.6), minjson")
 
-    try:
-        return json.read, json.write
-    except AttributeError:
-        raise ImportError("No JSON modules are present (currently supported: " +
-            + "anyjson, json, minjson")
-
-jread, jwrite = _detectJSON()
+jread, jwrite, JReadError, JWriteError = _detectJSON()
 
 def _detectMD5():
     """Detect md5 implementation for current version of Python."""
