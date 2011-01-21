@@ -23,6 +23,7 @@ from zope import interface
 from twisted.trial import unittest
 
 import unhosted
+import unhosted.checker
 import unhosted.utils
 
 class DummyAccount(object):
@@ -69,7 +70,7 @@ class UtilsTestCase(unittest.TestCase):
             self.failUnlessEqual(value, unhosted.utils.md5(key).hexdigest())
 
     def test_30_void_account_checker(self):
-        checker = unhosted.utils.VoidChecker()
+        checker = unhosted.checker.VoidChecker()
         self.failUnlessRaises(TypeError, checker.check, None)
         self.failUnlessRaises(TypeError, checker.check, "string")
         self.failUnlessEqual(checker.check(DummyAccount()), None)
