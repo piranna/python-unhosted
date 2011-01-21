@@ -97,6 +97,7 @@ class DatabaseStorage(object):
         row = cursor.execute(
         """ SELECT value FROM unhosted
             WHERE channel=? AND key=?
+            LIMIT 1
         """,(channel, key)).fetchone()
 
         if row is None:
@@ -112,20 +113,17 @@ class DatabaseStorage(object):
         if not cursor:
             cursor = self._db.cursor()
 
-        row = cursor.execute(
-        """ SELECT COUNT(*) FROM unhosted
-            WHERE channel=? AND key=?
-        """,(channel, key))
-
-        if row[0] > 0:
+        if self.has(channel, key, cursor):
             cursor.execute(
             """ UPDATE unhosted
                 SET value=? channel=? AND key=?
+                LIMIT 1
             """,(value, channel, key))
         else:
             cursor.execute(
             """ INSERT INTO unhosted(value, channel, path)
                 VALUES(?,?,?)
+                LIMIT 1
             """,(value, channel, key))
 
 
@@ -139,6 +137,7 @@ class DatabaseStorage(object):
         row = cursor.execute(
         """ SELECT COUNT(*) FROM unhosted
             WHERE channel=? AND key=?
+            LIMIT 1
         """,(channel, key)).fetchone()
 
         return row[0] > 0
