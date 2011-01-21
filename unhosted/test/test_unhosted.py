@@ -37,7 +37,7 @@ class Unhosted_0_2_TestCase(unittest.TestCase):
         uh = unhosted.Unhosted(
             unhosted.storage.dictionary.DictionaryStorage({}),
             unhosted.utils.VoidChecker())
-        uh.registerModule(unhosted.modules.keyvalue.KeyValue_0_2(), ["KeyValue-0.2"])
+        unhosted.modules.keyvalue.KeyValue_0_2().install(uh)
 
         request = {
             "protocol"      : "KeyValue-0.2",
@@ -59,7 +59,7 @@ class Unhosted_0_2_TestCase(unittest.TestCase):
         uh = unhosted.Unhosted(
             unhosted.storage.dictionary.DictionaryStorage({}),
             unhosted.utils.VoidChecker())
-        uh.registerModule(unhosted.modules.keyvalue.KeyValue_0_2(), ["KeyValue-0.2"])
+        unhosted.modules.keyvalue.KeyValue_0_2().install(uh)
 
         request = {
             "protocol"      : "KeyValue-0.2",

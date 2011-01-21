@@ -25,11 +25,14 @@ from zope import interface
 
 import unhosted.interfaces
 import unhosted.http
+import unhosted.basemodule
 
-class KeyValue_0_2(object):
+class KeyValue_0_2(unhosted.basemodule.BaseModule):
     """KeyValue-0.2 module."""
 
     interface.implements(unhosted.interfaces.IModule)
+
+    names = ["KeyValue-0.2"]
 
     def initialize(self, unhosted):
         """Initialize module for given unhosted instance."""
@@ -80,7 +83,8 @@ class KeyValue_0_2(object):
         except KeyError:
             raise unhosted.http.HttpBadRequest(
                 "the following fields are obligatory for KeyValue-0.2 SET: "
-                "command.keyHash, command.user, storageNode, app, password")
+                "command.keyHash, command.user, storageNode, app, password, "
+                "command.value, pubSign")
 
         acc = self.unhosted.storage.account(user, node, app, password=password)
         self.unhosted.storage.set(acc, key, value, pubSign)
