@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Python library for Unhosted storage node - additional storage classes.
+# Python library for Unhosted storage node - dictionary storage class.
 # Copyright 2010 Dmitrij "Divius" Tantsur <divius.inside@gmail.com>
 #
 # This library is free software; you can redistribute it and/or
@@ -23,12 +23,12 @@
 
 """
 
-__all__ = ['DictStorage']
+__all__ = ['DictionaryStorage']
 
 from zope import interface
 import unhosted.interfaces
 
-class DictStorage(object):
+class DictionaryStorage(object):
     """Wrapper around any dict-like object."""
 
     interface.implements(unhosted.interfaces.IStorage)
