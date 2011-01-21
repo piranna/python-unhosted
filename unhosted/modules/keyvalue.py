@@ -25,9 +25,10 @@ from zope import interface
 
 import unhosted.interfaces
 import unhosted.http
-import unhosted.basemodule
 
-class KeyValue_0_2(unhosted.basemodule.BaseModule):
+from . import BaseModule
+
+class KeyValue_0_2(BaseModule):
     """KeyValue-0.2 module."""
 
     interface.implements(unhosted.interfaces.IModule)
