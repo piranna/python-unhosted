@@ -21,9 +21,6 @@
 
 """This package contains some utils for Unhosted."""
 
-from zope import interface
-import unhosted.interfaces
-
 def _detectJSON():
     """Determine what JSON module we have."""
     # Try use anyjson to detect the fastest module

@@ -6,9 +6,10 @@ from twisted.internet import reactor
 from twisted.web.server import Site
 from twisted.web.static import File
 
-from unhosted import Unhosted, tx, checker
-from unhosted.storage import database
-from unhosted.modules import keyvalue
+from unhosted import Unhosted, checker
+from unhosted.modules  import keyvalue
+from unhosted.platform import tx
+from unhosted.storage  import database
 
 # Command line arguments
 parser = argparse.ArgumentParser(description='UnHosted node and webpages server.')
