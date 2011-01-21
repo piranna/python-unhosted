@@ -38,14 +38,14 @@ class DictStorage(object):
 
         zope.interface.implements(unhosted.IAccount)
 
-    def __init__(self, initial=None):
+    def __init__(self, initial={}):
         """C-tor.
 
         Second parameter is initial value of dictionary:
         {channel : {key : value}}
 
         """
-        self._dict = initial or {}
+        self._dict = initial
 
     def get(self, account, key):
         """Gets value from storage."""
