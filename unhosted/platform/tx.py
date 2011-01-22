@@ -23,7 +23,7 @@
 
 """
 
-__all__ = ['UnhostedResource']
+__all__ = ['Unhosted']
 
 from twisted.web import resource
 from twisted.internet import defer
@@ -31,18 +31,10 @@ from twisted.internet import defer
 import unhosted.http
 import unhosted.utils
 
-
-def _convertArgs(args):
-    result = {}
-    for key, value in args.iteritems():
-        if len(value) == 1:
-            result[key] = value[0]
-        else:
-            result[key] = value
-    return result
+from . import _convertArgs
 
 
-class UnhostedResource(resource.Resource):
+class Unhosted(resource.Resource):
     """TwistedWeb resource for Unhosted."""
 
     isLeaf = True
@@ -59,7 +51,7 @@ class UnhostedResource(resource.Resource):
         request._unhosted_canceled = False
         request._unhosted_d = defer.maybeDeferred(
             self.unhosted.processRequest(args))
-        request._unhosted_d.addCallback(self._processDeferreds)
+        request._unhosted_d.addCallback(self._process)
         request._unhosted_d.addCallback(self._ready, request)
         request._unhosted_d.addErrback(self._error, request)
         request.notifyFinish().addErrback(self._fail, request)
@@ -68,7 +60,7 @@ class UnhostedResource(resource.Resource):
 
     # Protected
 
-    def _processDeferreds(self, data):
+    def _process(self, data):
         def _doProcessOneDeferred(value, data, key):
             data[key] = value
 
@@ -85,11 +77,11 @@ class UnhostedResource(resource.Resource):
 
     def _ready(self, data, request):
         """Requested data ready."""
-        if data is not None and not isinstance(data, str):
-            data = unhosted.utils.jwrite(data)
+#        request.setResponseCode(200, "OK")
 
-        request.setResponseCode(200, "OK")
         if data is not None:
+            if not isinstance(data, str):
+                data = unhosted.utils.jwrite(data)
             request.write(data + "\n")
         request.finish()
 

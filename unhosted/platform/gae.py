@@ -1,20 +1,15 @@
 from google.appengine.ext import webapp
 
-from unhosted import Unhosted,utils
-from unhosted.checker.void import VoidChecker
+import unhosted.utils
+
+from . import _convertArgs
 
 
-class UnhostedRequestHandler(webapp.RequestHandler):
+class Unhosted(webapp.RequestHandler):
     '''
     Google AppEngine request handler for UnHosted
     '''
-
-    def __init__(self):
-        '''
-        Constructor
-        '''
-        # Connect database and UnHosted interface
-        self.unhosted = Unhosted(GaeDB(), VoidChecker())
+    unhosted = None
 
 
     def post(self):
@@ -22,21 +17,24 @@ class UnhostedRequestHandler(webapp.RequestHandler):
         Render POST request
         '''
         args = _convertArgs(self.request.args)
-        data = self.unhosted.processRequest(args)
 
-#        data = _processDeferreds(data)
+        try:
+            data = self.unhosted.processRequest(args)
+        except:
+            data = self._error(err)
+        else:
+            data = self._ready(data)
 
-#        if :
-        data = self._ready(data)
-#        else:
-#            data = self._error(err)
+        if data:
+            self.response.out.write(data + "\n")
 
-        self.response.out.write(data)
+
+    # Protected
 
 
     def _ready(self, data):
-        """Requested data ready."""
-        if data:
-            if not isinstance(data, str):
-                data = utils.jwrite(data)
-            self.response.out.write(data + "\n")
+        '''
+        Requested data ready
+        '''
+        if data and not isinstance(data, str):
+            return utils.jwrite(data)

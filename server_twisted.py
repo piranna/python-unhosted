@@ -6,10 +6,12 @@ from twisted.internet import reactor
 from twisted.web.server import Site
 from twisted.web.static import File
 
-from unhosted import Unhosted, checker
+from unhosted import Unhosted
+from unhosted.checker  import void
 from unhosted.modules  import keyvalue
 from unhosted.platform import tx
 from unhosted.storage  import database
+
 
 # Command line arguments
 parser = argparse.ArgumentParser(description='UnHosted node and webpages server.')
@@ -26,7 +28,7 @@ uh.registerModule(keyvalue.KeyValue_0_2(), ["KeyValue-0.2"])
 
 # Serve webpages and UnHosted RPC
 root = File(args.rootdir)
-root.putChild("unhosted", tx.UnhostedResource(uh))
+root.putChild("unhosted", tx.Unhosted(uh))
 
 # Start server
 reactor.listenTCP(8080, Site(root))
