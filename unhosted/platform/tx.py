@@ -28,10 +28,8 @@ __all__ = ['Unhosted']
 from twisted.web import resource
 from twisted.internet import defer
 
-import unhosted.http
-import unhosted.utils
-
 from . import _convertArgs
+from .. import http,utils
 
 
 class Unhosted(resource.Resource):

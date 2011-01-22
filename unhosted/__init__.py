@@ -29,6 +29,8 @@ __all__ = ['Unhosted']
 __version_info__ = ('0', '2', '0')
 __version__ = '.'.join(__version_info__)
 
+import unhosted.http
+
 
 class Unhosted(object):
     '''
@@ -89,22 +91,20 @@ class Unhosted(object):
             try:
                 request = unhosted.utils.jread(request)
             except unhosted.utils.JReadError:
-                raise unhosted.http.HttpBadRequest("cannot parse request")
-
-        import unhosted.http
+                raise http.HttpBadRequest("cannot parse request")
 
         # Check for protocol and command parameters
         try:
             proto, command = request["protocol"], request["command"]
         except KeyError:
-            raise unhosted.http.HttpBadRequest(
+            raise http.HttpBadRequest(
                 "the following fields are obligatory: protocol, command")
 
         # Check if module is supported by the system
         try:
             module = self.modules[proto]
         except KeyError:
-            raise unhosted.http.HttpBadRequest("unsupported protocol %s" % proto)
+            raise http.HttpBadRequest("unsupported protocol %s" % proto)
 
         # Get command field
         if isinstance(command, basestring):
@@ -112,7 +112,7 @@ class Unhosted(object):
             try:
                 command = unhosted.utils.jread(command)
             except unhosted.utils.JReadError:
-                raise unhosted.http.HttpBadRequest("cannot parse command field")
+                raise http.HttpBadRequest("cannot parse command field")
 
         # Process command
         return module.processCommand(request, command)
