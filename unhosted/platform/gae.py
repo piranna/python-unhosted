@@ -1,8 +1,7 @@
 from google.appengine.ext import webapp
 
-import unhosted.utils
-
 from . import _convertArgs
+from .. import http,utils
 
 
 class Unhosted(webapp.RequestHandler):
@@ -20,8 +19,10 @@ class Unhosted(webapp.RequestHandler):
 
         try:
             data = self.unhosted.processRequest(args)
-        except:
-            data = self._error(err)
+
+        except http.HttpBadRequest, e:
+            data = self._error(e)
+
         else:
             data = self._ready(data)
 
@@ -30,6 +31,18 @@ class Unhosted(webapp.RequestHandler):
 
 
     # Protected
+
+    def _error(self, err):
+        '''
+        Error while requesting data.
+        '''
+        if isinstance(err, http.HttpStatus):
+            web.ctx.status = err.code()
+        else:
+            web.ctx.status = http.HttpInternalServerError._code+' '+"Unknown exception:"
+
+        web.ctx.status += ' '+str(err)
+        return str(err)
 
 
     def _ready(self, data):
