@@ -19,51 +19,71 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-"""This package implements Unhosted server-side classes and handlers.
+'''
+This package implements Unhosted server-side classes and handlers.
 
 This package exports Unhosted and Storage classes.
-
-"""
+'''
 
 __all__ = ['Unhosted']
 __version_info__ = ('0', '2', '0')
 __version__ = '.'.join(__version_info__)
 
+
 class Unhosted(object):
-    """Class representing Unhosted engine."""
+    '''
+    Class representing Unhosted engine.
+    '''
 
     def __init__(self, storage, registrationChecker):
-        """C-tor.
+        '''
+        'C-tor.
 
         Argument 'storage' should be of type unhosted.Storage.
-
-        """
+        '''
+        # Check if storage and registrationChecker are both of the correct types
         from unhosted import interfaces
         if not interfaces.IStorage.providedBy(storage):
             raise TypeError("storage must provide IStorage")
         if not interfaces.IRegistrationChecker.providedBy(registrationChecker):
             raise TypeError("registrationChecker must provide IRegistrationChecker")
 
+        # Set values
         self.storage = storage
         self.registrationChecker = registrationChecker
         self.modules = {}
 
+
     def registerModule(self, module, names):
-        """Register module instance for given module names."""
+        '''
+        Register module instance for given module names.
+        '''
+        # Check if 'module' is a module
         from unhosted import interfaces
         if not interfaces.IModule.providedBy(module):
             raise TypeError("module must provide IModule")
-        if not isinstance(names, list):
-            raise TypeError("names must be a list of strings")
 
-        for name in names:
+        # Register module both is a string or a list of strings
+        def priv_registerModule(name):
             if not isinstance(name, str):
-                raise TypeError("names must be a list of strings")
+                raise TypeError("names must be a string or a list of strings")
             self.modules[name] = module
+
+        if isinstance(names,list):
+            for name in names:
+                priv_registerModule(name)
+        else:
+            priv_registerModule(names)
+
+        # Initialize module
         module.initialize(self)
 
+
     def processRequest(self, request):
-        """Process RPC request (either json string or dict)."""
+        '''
+        Process RPC request (either json string or dict).
+        '''
+        # Get UnHosted JSON request from HTTP request
         if isinstance(request, basestring):
             import unhosted.utils
             try:
@@ -73,17 +93,20 @@ class Unhosted(object):
 
         import unhosted.http
 
+        # Check for protocol and command parameters
         try:
             proto, command = request["protocol"], request["command"]
         except KeyError:
             raise unhosted.http.HttpBadRequest(
                 "the following fields are obligatory: protocol, command")
 
+        # Check if module is supported by the system
         try:
             module = self.modules[proto]
         except KeyError:
             raise unhosted.http.HttpBadRequest("unsupported protocol %s" % proto)
 
+        # Get command field
         if isinstance(command, basestring):
             import unhosted.utils
             try:
@@ -91,4 +114,5 @@ class Unhosted(object):
             except unhosted.utils.JReadError:
                 raise unhosted.http.HttpBadRequest("cannot parse command field")
 
+        # Process command
         return module.processCommand(request, command)
