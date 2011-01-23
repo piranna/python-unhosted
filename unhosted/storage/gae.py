@@ -1,10 +1,20 @@
 from google.appengine.ext import db
 
+from zope import interface
+from ..interfaces import IStorage
+
 
 class GaeDB(object):
+    '''
+    Class to access to Google AppEngine datastore
+    '''
+
+    interface.implements(IStorage)
+
     class unhosted(db.Model):
         channel = db.StringProperty()
-        key = db.StringProperty()
+        key_ = db.StringProperty(name='key')
+#        key = db.StringProperty()
         value = db.BlobProperty()
 
         #PRIMARY KEY(channel, path)

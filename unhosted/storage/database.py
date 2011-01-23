@@ -26,7 +26,7 @@ This package implements storage in DB-API 2.0 database for Unhosted.
 __all__ = ['DatabaseStorage']
 
 from zope import interface
-import unhosted.interfaces
+from ..interfaces import IStorage
 
 
 def runInteraction(method):
@@ -51,12 +51,13 @@ def runInteraction(method):
 
     return wrapped
 
+
 class DatabaseStorage(object):
     '''
     Wrapper storage for any DB-API 2.0 compatible database.
     '''
 
-    interface.implements(unhosted.interfaces.IStorage)
+    interface.implements(IStorage)
 
     def __init__(self, database):
         '''
