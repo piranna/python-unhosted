@@ -4,6 +4,11 @@ import sqlite3
 
 import web
 
+# if we don't have unhosted installed (example purposes only)...
+import os
+import sys
+sys.path.insert(0, os.path.abspath("../../"))
+
 from unhosted import Unhosted
 from unhosted.checker  import void
 from unhosted.modules  import keyvalue
