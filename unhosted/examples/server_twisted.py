@@ -6,6 +6,11 @@ from twisted.internet import reactor
 from twisted.web.server import Site
 from twisted.web.static import File
 
+# if we don't have unhosted installed (example purposes only)...
+import os
+import sys
+sys.path.insert(0, os.path.abspath("../../"))
+
 from unhosted import Unhosted
 from unhosted.checker  import void
 from unhosted.modules  import keyvalue
@@ -23,7 +28,7 @@ args = parser.parse_args()
 
 # Connect database and UnHosted interface
 db = database.DatabaseStorage(sqlite3.connect(args.database))
-uh = Unhosted(db, checker.VoidChecker())
+uh = Unhosted(db, void.VoidChecker())
 uh.registerModule(keyvalue.KeyValue_0_2(), ["KeyValue-0.2"])
 
 # Serve webpages and UnHosted RPC
