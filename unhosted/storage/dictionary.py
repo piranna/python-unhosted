@@ -23,13 +23,13 @@
 This package implements IStorage wrapper for dict-like objects for Unhosted.
 """
 
-__all__ = ['DictionaryStorage']
+__all__ = ['Dictionary']
 
 from zope import interface
 import unhosted.interfaces
 
 
-class DictionaryStorage(object):
+class Dictionary(object):
     """Wrapper around any dict-like object."""
 
     interface.implements(unhosted.interfaces.IStorage)

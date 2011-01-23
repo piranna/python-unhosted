@@ -29,10 +29,27 @@ class File:
     path = "."
 
     def GET(self, path):
-        from os.path import abspath,join
+        import os
+        import stat
 
-        with open(abspath(join(self.path,path)), 'r') as f:
-            return f.read()
+        try:
+            pathname = os.path.abspath(os.path.join(self.path,path))
+            mode = os.stat(pathname)[stat.ST_MODE]
+            if stat.S_ISDIR(mode):
+                ret = '<html>'
+                ret += '<head><title>%s</title></head>'%path
+                ret += '<body><ul>'
+                for entry in os.listdir(pathname):
+                    ret += '<li><a href="%s">%s</a></li>'%(path+'/'+entry,entry)
+                ret += '</ul></body></html>'
+                return ret
+
+            elif stat.S_ISREG(mode):
+                with open(pathname, 'r') as f:
+                    return f.read()
+
+        except OSError:
+            web.ctx.status = '404 Not file %s found'%path
 
 
 # Connect database and UnHosted interface
@@ -44,8 +61,8 @@ uh.registerModule(keyvalue.KeyValue_0_2(), ["KeyValue-0.2"])
 File.path = args.rootdir
 webpy.Unhosted.unhosted = uh
 
-app = web.application(('/unhosted','webpy.Unhosted',
-                       '/(.*)','File'),
+app = web.application(('/unhosted', webpy.Unhosted,
+                       '/(.*)',     File),
                        globals())
 
 # Start server

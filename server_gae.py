@@ -5,36 +5,52 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from unhosted import Unhosted
 from unhosted.checker  import void
 from unhosted.modules  import keyvalue
-from unhosted.platform import gae
-from unhosted.storage  import gae
+from unhosted.platform import gae as platform
+from unhosted.storage  import gae as storage
 
 
 class File(webapp.RequestHandler):
     '''
-    Class that somewhat mimics twisted.web.static.File for web.py
+    Class that somewhat mimics twisted.web.static.File for Google AppEngine
 
     This class allow to get the content of a file or a directory filesystem.
     '''
     path = "."
 
     def get(self, path):
-        from os.path import abspath,join
+        import os
+        import stat
 
-        with open(abspath(join(self.path,path)), 'r') as f:
-            return f.read()
+        try:
+            pathname = os.path.abspath(os.path.join(self.path,path))
+            mode = os.stat(pathname)[stat.ST_MODE]
+            if stat.S_ISDIR(mode):
+                self.response.out.write('<html>')
+                self.response.out.write('<head><title>%s</title></head>'%path)
+                self.response.out.write('<body><ul>')
+                for entry in os.listdir(pathname):
+                    self.response.out.write('<li><a href="%s">%s</a></li>'%(path+'/'+entry,entry))
+                self.response.out.write('</ul></body></html>')
+
+            elif stat.S_ISREG(mode):
+                with open(pathname, 'r') as f:
+                    self.response.out.write(f.read())
+
+        except OSError:
+            self.error(404)
+#            web.ctx.status = '404 Not file %s found'%path
 
 
 # Connect database and UnHosted interface
-db = gae.GaeDB()
-uh = Unhosted(db, VoidChecker())
+db = storage.GaeDB()
+uh = Unhosted(db, void.VoidChecker())
 uh.registerModule(keyvalue.KeyValue_0_2(), ["KeyValue-0.2"])
 
 # Serve webpages and UnHosted RPC
-File.path = args.rootdir
-gae.Unhosted.unhosted = uh
+platform.Unhosted.unhosted = uh
 
-application = webapp.WSGIApplication([('/unhosted', gae.Unhosted),
-                                      ('/(.*)',     Main)],
+application = webapp.WSGIApplication([('/unhosted', platform.Unhosted),
+                                      ('/(.*)',     File)],
                                      debug=True)
 
 # Start server
