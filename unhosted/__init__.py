@@ -32,6 +32,8 @@ __version__ = '.'.join(__version_info__)
 class Unhosted(object):
     """Class representing Unhosted engine."""
 
+    baseProtocol = "UJJP/0.2;"
+
     def __init__(self, storage, registrationChecker):
         """C-tor.
 
@@ -62,8 +64,9 @@ class Unhosted(object):
             self.modules[name] = module
         module.initialize(self)
 
-    def processRequest(self, request):
+    def processRequest(self, request, node=None, app=None):
         """Process RPC request (either json string or dict)."""
+        import unhosted.http
         if isinstance(request, basestring):
             import unhosted.utils
             try:
@@ -71,18 +74,21 @@ class Unhosted(object):
             except unhosted.utils.JReadError:
                 raise unhosted.http.HttpBadRequest("cannot parse request")
 
-        import unhosted.http
-
         try:
             proto, command = request["protocol"], request["command"]
         except KeyError:
             raise unhosted.http.HttpBadRequest(
                 "the following fields are obligatory: protocol, command")
 
+        if not proto.startswith(self.baseProtocol):
+            raise unhosted.http.HttpBadRequest("unsupported protocol %s" % proto)
+
+        proto = proto[len(self.baseProtocol):]
+
         try:
             module = self.modules[proto]
         except KeyError:
-            raise unhosted.http.HttpBadRequest("unsupported protocol %s" % proto)
+            raise unhosted.http.HttpBadRequest("unsupported module %s" % proto)
 
         if isinstance(command, basestring):
             import unhosted.utils
@@ -90,5 +96,10 @@ class Unhosted(object):
                 command = unhosted.utils.jread(command)
             except unhosted.utils.JReadError:
                 raise unhosted.http.HttpBadRequest("cannot parse command field")
+
+        if node is not None:
+            request["storageNode"] = node
+        if app is not None:
+            request["app"] = app
 
         return module.processCommand(request, command)

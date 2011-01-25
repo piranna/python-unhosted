@@ -40,7 +40,7 @@ class Unhosted_0_2_TestCase(unittest.TestCase):
         unhosted.modules.keyvalue.KeyValue_0_2().install(uh)
 
         request = {
-            "protocol"      : "KeyValue-0.2",
+            "protocol"      : unhosted.Unhosted.baseProtocol + "KeyValue-0.2",
             "storageNode"   : "testNode",
             "app"           : "testApp",
             "command"       : {
@@ -62,7 +62,7 @@ class Unhosted_0_2_TestCase(unittest.TestCase):
         unhosted.modules.keyvalue.KeyValue_0_2().install(uh)
 
         request = {
-            "protocol"      : "KeyValue-0.2",
+            "protocol"      : unhosted.Unhosted.baseProtocol + "KeyValue-0.2",
             "storageNode"   : "testNode",
             "app"           : "testApp",
             "command"       : {
@@ -80,7 +80,7 @@ class Unhosted_0_2_TestCase(unittest.TestCase):
         self.failUnlessEqual(response, {})
 
         request = {
-            "protocol"      : "KeyValue-0.2",
+            "protocol"      : unhosted.Unhosted.baseProtocol + "KeyValue-0.2",
             "storageNode"   : "testNode",
             "app"           : "testApp",
             "command"       : {

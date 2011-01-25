@@ -34,9 +34,15 @@ class DictionaryStorage(object):
     interface.implements(unhosted.interfaces.IStorage)
 
     class Account(object):
-        """Account for DictStorage."""
+        """Account for DictionaryStorage."""
 
         interface.implements(unhosted.interfaces.IAccount)
+
+        def __init__(self, user, node, app):
+            self.test = user + node + app # TODO
+
+        def __str__(self):
+            return self.test # TODO
 
     def __init__(self, initial=None):
         """C-tor.
@@ -55,7 +61,7 @@ class DictionaryStorage(object):
     def set(self, account, key, value, signature):
         """Sets value in storage."""
         channel = str(account)
-        if not channel in self._dict:
+        if channel not in self._dict:
             self._dict[channel] = {}
         self._dict[channel][key] = (value, signature)
 
@@ -66,5 +72,5 @@ class DictionaryStorage(object):
 
     def account(self, user, node, application, **kwargs):
         """Create an account."""
-        return self.Account()
+        return self.Account(user, node, application)
 

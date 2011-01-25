@@ -65,6 +65,7 @@ class KeyValue_0_2(unhosted.basemodule.BaseModule):
                 command["keyHash"], command["user"], \
                 request["storageNode"], request["app"]
         except KeyError:
+            raise
             raise unhosted.http.HttpBadRequest(
                 "the following fields are obligatory for KeyValue-0.2 GET: "
                 "command.keyHash, command.user, storageNode, app")
@@ -81,6 +82,7 @@ class KeyValue_0_2(unhosted.basemodule.BaseModule):
                 request["storageNode"], request["app"], \
                 request["password"], request["pubSign"]
         except KeyError:
+            raise
             raise unhosted.http.HttpBadRequest(
                 "the following fields are obligatory for KeyValue-0.2 SET: "
                 "command.keyHash, command.user, storageNode, app, password, "

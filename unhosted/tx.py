@@ -25,20 +25,11 @@
 
 __all__ = ['UnhostedResource']
 
-from twisted.web import resource
+from twisted.web import resource, server
 from twisted.internet import defer
 
 import unhosted.http
 import unhosted.utils
-
-def _convertArgs(args):
-    result = {}
-    for key, value in args.iteritems():
-        if len(value) == 1:
-            result[key] = value[0]
-        else:
-            result[key] = value
-    return result
 
 def _processDeferreds(data):
     def _doProcessOneDeferred(value, data, key):
@@ -65,10 +56,10 @@ class UnhostedResource(resource.Resource):
 
     def render_POST(self, request):
         """Render POST request."""
-        args = _convertArgs(request.args)
         request._unhosted_canceled = False
         request._unhosted_d = defer.maybeDeferred(
-            self.unhosted.processRequest(args))
+            self.unhosted.processRequest, request.content.read(),
+            request.getRequestHostname(), request.getHeader("referer"))
         request._unhosted_d.addCallback(_processDeferreds)
         request._unhosted_d.addCallback(self._ready, request)
         request._unhosted_d.addErrback(self._error, request)

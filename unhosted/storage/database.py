@@ -54,6 +54,17 @@ class DatabaseStorage(object):
 
     interface.implements(unhosted.interfaces.IStorage)
 
+    class Account(object):
+        """Account for DatabaseStorage."""
+
+        interface.implements(unhosted.interfaces.IAccount)
+
+        def __init__(self, user, node, app):
+            self.test = user + node + app # TODO
+
+        def __str__(self):
+            return self.test # TODO
+
     def __init__(self, database):
         """C-tor.
 
@@ -113,3 +124,7 @@ class DatabaseStorage(object):
                              (channel, key)
         ).fetchone()
         return row[0] > 0
+
+    def account(self, user, node, application, **kwargs):
+        """Create an account."""
+        return self.Account(user, node, application)
