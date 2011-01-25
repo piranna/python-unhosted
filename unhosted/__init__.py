@@ -19,11 +19,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-'''
-This package implements Unhosted server-side classes and handlers.
+"""This package implements Unhosted server-side classes and handlers.
 
 This package exports Unhosted and Storage classes.
-'''
+
+"""
 
 __all__ = ['Unhosted']
 __version_info__ = ('0', '2', '0')
@@ -33,16 +33,16 @@ import unhosted.http
 
 
 class Unhosted(object):
-    '''
-    Class representing Unhosted engine.
-    '''
+    """Class representing Unhosted engine."""
+
+    baseProtocol = "UJJP/0.2;"
 
     def __init__(self, storage, registrationChecker):
-        '''
-        'C-tor.
+        """C-tor.
 
         Argument 'storage' should be of type unhosted.Storage.
-        '''
+
+        """
         # Check if storage and registrationChecker are both of the correct types
         from unhosted import interfaces
         if not interfaces.IStorage.providedBy(storage):
@@ -57,9 +57,7 @@ class Unhosted(object):
 
 
     def registerModule(self, module, names):
-        '''
-        Register module instance for given module names.
-        '''
+        """Register module instance for given module names."""
         # Check if 'module' is a module
         from unhosted import interfaces
         if not interfaces.IModule.providedBy(module):
@@ -80,31 +78,33 @@ class Unhosted(object):
         # Initialize module
         module.initialize(self)
 
-
-    def processRequest(self, request):
-        '''
-        Process RPC request (either json string or dict).
-        '''
+    def processRequest(self, request, node=None, app=None):
+        """Process RPC request (either json string or dict)."""
         # Get UnHosted JSON request from HTTP request
         if isinstance(request, basestring):
             import unhosted.utils
             try:
                 request = unhosted.utils.jread(request)
             except unhosted.utils.JReadError:
-                raise http.HttpBadRequest("cannot parse request")
+                raise unhosted.http.HttpBadRequest("cannot parse request")
 
         # Check for protocol and command parameters
         try:
             proto, command = request["protocol"], request["command"]
         except KeyError:
-            raise http.HttpBadRequest(
+            raise unhosted.http.HttpBadRequest(
                 "the following fields are obligatory: protocol, command")
+
+        if not proto.startswith(self.baseProtocol):
+            raise unhosted.http.HttpBadRequest("unsupported protocol %s" % proto)
+
+        proto = proto[len(self.baseProtocol):]
 
         # Check if module is supported by the system
         try:
             module = self.modules[proto]
         except KeyError:
-            raise http.HttpBadRequest("unsupported protocol %s" % proto)
+            raise unhosted.http.HttpBadRequest("unsupported module %s" % proto)
 
         # Get command field
         if isinstance(command, basestring):
@@ -112,7 +112,12 @@ class Unhosted(object):
             try:
                 command = unhosted.utils.jread(command)
             except unhosted.utils.JReadError:
-                raise http.HttpBadRequest("cannot parse command field")
+                raise unhosted.http.HttpBadRequest("cannot parse command field")
+
+        if node is not None:
+            request["storageNode"] = node
+        if app is not None:
+            request["app"] = app
 
         # Process command
         return module.processCommand(request, command)
