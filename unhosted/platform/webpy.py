@@ -37,9 +37,9 @@ class Unhosted:
         Error while requesting data.
         '''
         if isinstance(err, http.HttpStatus):
-            web.ctx.status = err.code()
+            web.ctx.status = str(err.code())
         else:
-            web.ctx.status = http.HttpInternalServerError._code+' '+"Unknown exception:"
+            web.ctx.status = str(http.HttpInternalServerError._code)+' '+"Unknown exception:"
 
         web.ctx.status += ' '+str(err)
         return str(err)
