@@ -19,13 +19,14 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-"""This package implements storage in DB-API 2.0 database for Unhosted."""
+"""This package implements storage in DB-API 2.0 database for Unhosted.
+
+"""
 
 __all__ = ['DatabaseStorage']
 
 from zope import interface
-from unhosted.interfaces import IStorage
-
+import unhosted.interfaces
 
 def runInteraction(method):
     """Run safe database interaction.
@@ -34,6 +35,7 @@ def runInteraction(method):
     parameters passed to this method.
     Commits on success, rollbacks on raised exception.
     Propagates any raised exceptions.
+
     """
 
     def wrapped(self, *args, **kwargs):
@@ -52,13 +54,25 @@ def runInteraction(method):
 class DatabaseStorage(object):
     """Wrapper storage for any DB-API 2.0 compatible database."""
 
-    interface.implements(IStorage)
+    interface.implements(unhosted.interfaces.IStorage)
+
+    class Account(object):
+        """Account for DatabaseStorage."""
+
+        interface.implements(unhosted.interfaces.IAccount)
+
+        def __init__(self, user, node, app):
+            self.test = user + node + app # TODO
+
+        def __str__(self):
+            return self.test # TODO
 
     def __init__(self, database):
-        """"C-tor.
+        """C-tor.
 
         Argument 'database' should be any DB-API 2.0 compatible connection.
         You may need to call initializeDB() to create all required tables.
+
         """
 
         self._db = database
@@ -129,3 +143,8 @@ class DatabaseStorage(object):
         """,(channel, key)).fetchone()
 
         return row[0] > 0
+
+
+    def account(self, user, node, application, **kwargs):
+        """Create an account."""
+        return self.Account(user, node, application)

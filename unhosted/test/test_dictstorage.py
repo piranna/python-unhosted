@@ -15,7 +15,7 @@ class DictStorageTestCase(unittest.TestCase):
 
     def test_10_empty_dict(self):
         # Instance for testing
-        storage = unhosted.storage.dictionary.Dictionary({})
+        storage = unhosted.storage.dictionary.DictionaryStorage({})
         assert unhosted.interfaces.IStorage.providedBy(storage)
 
         account = storage.account("userName", "node", "app")
