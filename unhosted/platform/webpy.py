@@ -1,21 +1,17 @@
 import web
 
-from . import _convertArgs
-from .. import http,utils
+from . import ConvertArgs
+from unhosted import http,utils
 
 
 class Unhosted:
-    '''
-    web.py class for UnHosted
-    '''
+    """web.py class for UnHosted"""
     unhosted = None
 
 
     def POST(self):
-        '''
-        Render POST request
-        '''
-        args = _convertArgs(web.input())
+        """Render POST request"""
+        args = ConvertArgs(web.input())
 
         try:
             data = self.unhosted.processRequest(args)
@@ -33,9 +29,7 @@ class Unhosted:
     # Protected
 
     def _error(self, err):
-        '''
-        Error while requesting data.
-        '''
+        """Error while requesting data."""
         if isinstance(err, http.HttpStatus):
             web.ctx.status = err.code()
         else:
@@ -46,8 +40,6 @@ class Unhosted:
 
 
     def _ready(self, data):
-        '''
-        Requested data ready
-        '''
+        """Requested data ready"""
         if data and not isinstance(data, str):
             return utils.jwrite(data)

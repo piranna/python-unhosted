@@ -1,21 +1,17 @@
 from google.appengine.ext import webapp
 
-from . import _convertArgs
-from .. import http,utils
+from . import ConvertArgs
+from unhosted import http,utils
 
 
 class Unhosted(webapp.RequestHandler):
-    '''
-    Google AppEngine request handler for UnHosted
-    '''
+    """Google AppEngine request handler for UnHosted"""
     unhosted = None
 
 
     def post(self):
-        '''
-        Render POST request
-        '''
-        args = _convertArgs(self.request.args)
+        """Render POST request"""
+        args = ConvertArgs(self.request.args)
 
         try:
             data = self.unhosted.processRequest(args)
@@ -33,9 +29,7 @@ class Unhosted(webapp.RequestHandler):
     # Protected
 
     def _error(self, err):
-        '''
-        Error while requesting data.
-        '''
+        """Error while requesting data."""
         if isinstance(err, http.HttpStatus):
             web.ctx.status = err.code()
         else:
@@ -46,8 +40,6 @@ class Unhosted(webapp.RequestHandler):
 
 
     def _ready(self, data):
-        '''
-        Requested data ready
-        '''
+        """Requested data ready"""
         if data and not isinstance(data, str):
             return utils.jwrite(data)

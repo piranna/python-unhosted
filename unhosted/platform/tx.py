@@ -28,8 +28,8 @@ __all__ = ['Unhosted']
 from twisted.web import resource
 from twisted.internet import defer
 
-from . import _convertArgs
-from .. import http,utils
+from . import ConvertArgs
+from unhosted import http,utils
 
 
 class Unhosted(resource.Resource):
@@ -45,7 +45,7 @@ class Unhosted(resource.Resource):
 
     def render_POST(self, request):
         """Render POST request."""
-        args = _convertArgs(request.args)
+        args = ConvertArgs(request.args)
         request._unhosted_canceled = False
         request._unhosted_d = defer.maybeDeferred(
             self.unhosted.processRequest(args))
@@ -59,7 +59,11 @@ class Unhosted(resource.Resource):
     # Protected
 
     def _process(self, data):
+        """Process the data and wait for the results if an array of commands
+        have been queried.
+        """
         def _doProcessOneDeferred(value, data, key):
+            """Set only one returned value"""
             data[key] = value
 
         deferlist = []

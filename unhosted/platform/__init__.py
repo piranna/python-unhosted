@@ -1,4 +1,4 @@
-def _convertArgs(args):
+def ConvertArgs(args):
     result = {}
     for key, value in args.iteritems():
         if len(value) == 1:

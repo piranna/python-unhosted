@@ -26,11 +26,10 @@ args = parser.parse_args()
 
 
 class File:
-    '''
-    Class that somewhat mimics twisted.web.static.File for web.py
+    """Class that somewhat mimics twisted.web.static.File for web.py
 
     This class allow to get the content of a file or a directory filesystem.
-    '''
+    """
     path = "."
 
     def GET(self, path):
