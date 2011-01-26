@@ -19,25 +19,22 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-"""
-This package implements storage in DB-API 2.0 database for Unhosted.
-"""
+"""This package implements storage in DB-API 2.0 database for Unhosted."""
 
 __all__ = ['DatabaseStorage']
 
 from zope import interface
-from ..interfaces import IStorage
+from unhosted.interfaces import IStorage
 
 
 def runInteraction(method):
-    '''
-    Run safe database interaction.
+    """Run safe database interaction.
 
     Calls 'method' argument with specially created cursor and all other
     parameters passed to this method.
     Commits on success, rollbacks on raised exception.
     Propagates any raised exceptions.
-    '''
+    """
 
     def wrapped(self, *args, **kwargs):
         try:
@@ -53,28 +50,23 @@ def runInteraction(method):
 
 
 class DatabaseStorage(object):
-    '''
-    Wrapper storage for any DB-API 2.0 compatible database.
-    '''
+    """Wrapper storage for any DB-API 2.0 compatible database."""
 
     interface.implements(IStorage)
 
     def __init__(self, database):
-        '''
-        C-tor.
+        """"C-tor.
 
         Argument 'database' should be any DB-API 2.0 compatible connection.
         You may need to call initializeDB() to create all required tables.
-        '''
+        """
 
         self._db = database
 
 
     @runInteraction
     def initializeDB(self, cursor=None):
-        '''
-        Initialize database for Unhosted.
-        '''
+        """Initialize database for Unhosted."""
         if not cursor:
             cursor = self._db.cursor()
 
@@ -107,9 +99,7 @@ class DatabaseStorage(object):
 
     @runInteraction
     def set(self, channel, key, value, cursor=None):
-        '''
-        Sets value in storage.
-        '''
+        """Sets value in storage."""
         if not cursor:
             cursor = self._db.cursor()
 
@@ -128,9 +118,7 @@ class DatabaseStorage(object):
 
 
     def has(self, channel, key, cursor=None):
-        '''
-        Checks key presence in storage.
-        '''
+        """Checks key presence in storage."""
         if not cursor:
             cursor = self._db.cursor()
 

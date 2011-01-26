@@ -19,8 +19,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-"""
-This package implements IStorage wrapper for dict-like objects for Unhosted.
+"""This package implements IStorage wrapper for dict-like objects for Unhosted.
 """
 
 __all__ = ['Dictionary']
@@ -39,14 +38,17 @@ class Dictionary(object):
 
         interface.implements(unhosted.interfaces.IAccount)
 
-    def __init__(self, initial={}):
+    def __init__(self, initial=None):
         """C-tor.
 
         Second parameter is initial value of dictionary:
         {channel : {key : value}}
 
         """
-        self._dict = initial
+        if initial:
+            self._dict = initial
+        else:
+            self._dict = {}
 
     def get(self, account, key):
         """Gets value from storage."""
@@ -68,4 +70,3 @@ class Dictionary(object):
     def account(self, user, node, application, **kwargs):
         """Create an account."""
         return self.Account()
-

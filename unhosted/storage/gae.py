@@ -1,13 +1,11 @@
 from google.appengine.ext import db
 
 from zope import interface
-from ..interfaces import IStorage
+from unhosted.interfaces import IStorage
 
 
 class GaeDB(object):
-    '''
-    Class to access to Google AppEngine datastore
-    '''
+    """Class to access to Google AppEngine datastore"""
 
     interface.implements(IStorage)
 
@@ -21,22 +19,16 @@ class GaeDB(object):
 
 
     def initializeDB(self):
-        '''
-        Initialize database for Unhosted.
-        '''
+        """Initialize database for Unhosted."""
         pass
 
     def get(self, channel, key, default=None):
-        '''
-        Gets value from storage.
-        '''
+        """Gets value from storage."""
         ret = self.has(channel, key)
         return ret.value if ret else default
 
     def set(self, channel, key, value):
-        '''
-        Sets value in storage.
-        '''
+        """Sets value in storage."""
         entity = self.has(channel, key)
         if entity:
             if value == entity.value:
@@ -47,9 +39,7 @@ class GaeDB(object):
         entity.put()
 
     def has(self, channel, key):
-        '''
-        Checks key presence in storage.
-        '''
+        """Checks key presence in storage."""
         query = self.unhosted.all()
         query.filter('channel =',channel).filter('key =',key)
         return query.get()

@@ -15,11 +15,10 @@ from unhosted.storage  import gae as storage
 
 
 class File(webapp.RequestHandler):
-    '''
-    Class that somewhat mimics twisted.web.static.File for Google AppEngine
+    """Class that somewhat mimics twisted.web.static.File for Google AppEngine
 
     This class allow to get the content of a file or a directory filesystem.
-    '''
+    """
     path = "."
 
     def get(self, path):
