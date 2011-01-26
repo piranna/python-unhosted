@@ -23,16 +23,29 @@
 
 """
 
-__all__ = ['Unhosted']
+__all__ = ['UnhostedResource']
 
-from twisted.web import resource
+from twisted.web import resource, server
 from twisted.internet import defer
 
-from . import ConvertArgs
-from unhosted import http,utils
+import unhosted.http
+import unhosted.utils
 
+def _processDeferreds(data):
+    def _doProcessOneDeferred(value, data, key):
+        data[key] = value
 
-class Unhosted(resource.Resource):
+    deferlist = []
+    if isinstance(data, dict):
+        for key in data:
+            if isinstance(data[key], defer.Deferred):
+                data[key].addCallback(_doProcessOneDeferred, data, key)
+                deferlist.append(data[key])
+        return defer.DeferredList(deferlist)
+    else:
+        return defer.maybeDeferred(data)
+
+class UnhostedResource(resource.Resource):
     """TwistedWeb resource for Unhosted."""
 
     isLeaf = True
@@ -45,11 +58,11 @@ class Unhosted(resource.Resource):
 
     def render_POST(self, request):
         """Render POST request."""
-        args = ConvertArgs(request.args)
         request._unhosted_canceled = False
         request._unhosted_d = defer.maybeDeferred(
-            self.unhosted.processRequest(args))
-        request._unhosted_d.addCallback(self._process)
+            self.unhosted.processRequest, request.content.read(),
+            request.getRequestHostname(), request.getHeader("referer"))
+        request._unhosted_d.addCallback(_processDeferreds)
         request._unhosted_d.addCallback(self._ready, request)
         request._unhosted_d.addErrback(self._error, request)
         request.notifyFinish().addErrback(self._fail, request)
@@ -57,25 +70,6 @@ class Unhosted(resource.Resource):
 
 
     # Protected
-
-    def _process(self, data):
-        """Process the data and wait for the results if an array of commands
-        have been queried.
-        """
-        def _doProcessOneDeferred(value, data, key):
-            """Set only one returned value"""
-            data[key] = value
-
-        deferlist = []
-        if isinstance(data, dict):
-            for key in data:
-                if isinstance(data[key], defer.Deferred):
-                    data[key].addCallback(_doProcessOneDeferred, data, key)
-                    deferlist.append(data[key])
-            return defer.DeferredList(deferlist)
-        else:
-            return defer.maybeDeferred(data)
-
 
     def _ready(self, data, request):
         """Requested data ready."""

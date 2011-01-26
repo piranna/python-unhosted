@@ -33,7 +33,7 @@ uh.registerModule(keyvalue.KeyValue_0_2(), ["KeyValue-0.2"])
 
 # Serve webpages and UnHosted RPC
 root = File(args.rootdir)
-root.putChild("unhosted", tx.Unhosted(uh))
+root.putChild("unhosted", tx.UnhostedResource(uh))
 
 # Start server
 reactor.listenTCP(8080, Site(root))

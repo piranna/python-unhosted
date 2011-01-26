@@ -21,23 +21,23 @@
 
 from twisted.trial import unittest
 
-from . import Unhosted
-from checker import void
-from modules import keyvalue
-from storage import dictionary
+import unhosted
+import unhosted.storage.dictionary
+import unhosted.utils
+import unhosted.modules.keyvalue
 
 class Unhosted_0_2_TestCase(unittest.TestCase):
 
     def test_10_unhosted_instance(self):
-        uh = Unhosted(
-            dictionary.Dictionary(),
-            void.VoidChecker())
+        uh = unhosted.Unhosted(
+            unhosted.storage.dictionary.DictionaryStorage({}),
+            unhosted.utils.VoidChecker())
 
     def test_20_KV_GET_empty(self):
-        uh = Unhosted(
-            dictionary.Dictionary(),
-            void.VoidChecker())
-        keyvalue.KeyValue_0_2().install(uh)
+        uh = unhosted.Unhosted(
+            unhosted.storage.dictionary.DictionaryStorage({}),
+            unhosted.utils.VoidChecker())
+        unhosted.modules.keyvalue.KeyValue_0_2().install(uh)
 
         request = {
             "protocol"      : unhosted.Unhosted.baseProtocol + "KeyValue-0.2",
@@ -56,10 +56,10 @@ class Unhosted_0_2_TestCase(unittest.TestCase):
         self.failUnlessEqual(response["PubSign"], None)
 
     def test_30_KV_GET_SET(self):
-        uh = Unhosted(
-            dictionary.Dictionary(),
-            void.VoidChecker())
-        keyvalue.KeyValue_0_2().install(uh)
+        uh = unhosted.Unhosted(
+            unhosted.storage.dictionary.DictionaryStorage({}),
+            unhosted.utils.VoidChecker())
+        unhosted.modules.keyvalue.KeyValue_0_2().install(uh)
 
         request = {
             "protocol"      : unhosted.Unhosted.baseProtocol + "KeyValue-0.2",
