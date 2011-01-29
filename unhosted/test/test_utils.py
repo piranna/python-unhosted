@@ -70,7 +70,7 @@ class UtilsTestCase(unittest.TestCase):
             self.failUnlessEqual(value, unhosted.utils.md5(key).hexdigest())
 
     def test_30_void_account_checker(self):
-        checker = unhosted.checker.VoidChecker()
+        checker = unhosted.checker.void.VoidChecker()
         self.failUnlessRaises(TypeError, checker.check, None)
         self.failUnlessRaises(TypeError, checker.check, "string")
         self.failUnlessEqual(checker.check(DummyAccount()), None)

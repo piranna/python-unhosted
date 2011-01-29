@@ -29,7 +29,7 @@ from zope import interface
 import unhosted.interfaces
 
 
-class Dictionary(object):
+class DictionaryStorage(object):
     """Wrapper around any dict-like object."""
 
     interface.implements(unhosted.interfaces.IStorage)
